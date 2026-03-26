@@ -24,7 +24,7 @@ PREREQUISITES
 INSTALLATION  
 1. Download all files  
 2. (Optional) To ease on-TV setup, consider editing NightscoutSetup.brs at the two lines labeled "'CUSTOMIZE STRING BELOW TO EASE ROKU OSK INPUTS".  
-3. Zip all files, ensuring the .Zip archive root folder contains the 1 file ("manifest") and the three directories ("components", "images", & "source")   
+3. Zip all files. 7-Zip works fine with Compression Level 9-Ultra. Just ensure the .Zip archive root folder contains the 1 file ("manifest") and the three directories ("components", "images", & "source").
 4. To sideload-install the Zip file, refer to https://developer.roku.com/docs/developer-program/getting-started/developer-setup.md  
    a. NOTE: Roku platform limitations prevent sideload-installed apps from providing user access to the Screensaver Settings menu option.  
             However, the Screensaver Settings menu option DOES display upon initial app sideloading.  
