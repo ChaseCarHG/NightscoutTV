@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="NightscoutDisclaimer" extends="Scene">
+  <script type="text/brightscript" uri="pkg:/components/NightscoutDisclaimer.brs" />
+  <children>
+    <Poster id="splash" uri="pkg:/images/splash_hd.png"
+            width="1920" height="1080" translation="[0,0]" />
+  </children>
+</component>

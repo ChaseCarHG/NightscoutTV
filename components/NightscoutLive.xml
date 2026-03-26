@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="NightscoutLive" extends="Scene">
+  <script type="text/brightscript" uri="pkg:/components/NightscoutLive.brs" />
+  <children>
+
+    <!-- =========================================================
+         LIVE DISPLAY
+         y=20  : App title (left) + BG value + trend (right)
+         y=62  : Custom title from Nightscout
+         y=108 : Yellow status / debug line
+         y=220 : Hours buttons (left) + delta/time (right)
+         y=310 : Graph group
+         y=1050: Footer hint
+    ========================================================= -->
+    <Rectangle id="mainScreen" width="1920" height="1080"
+               color="0x08080EFF">
+
+      <!-- Static app title top-left -->
+      <Label text="NightscoutTV for Roku"
+             font="font:MediumBoldSystemFont"
+             color="0xFFFFFFFF" translation="[60, 48]" />
+
+      <!-- Custom title from Nightscout (populated dynamically) -->
+      <Label id="customTitle" text=""
+             font="font:MediumBoldSystemFont"
+             color="0xFFFFFFFF" translation="[60, 90]" />
+
+      <!-- BG value + trend: large, top-right, scale 5x -->
+      <Label id="bgValue"    text="---"
+             font="font:LargeBoldSystemFont"
+             scaleRotateCenter="[0,0]" scale="[5.0, 5.0]"
+             color="0xFFFFFFFF" translation="[1020, 10]" />
+      <Label id="trendLabel" text="?"
+             font="font:LargeBoldSystemFont"
+             scaleRotateCenter="[0,0]" scale="[5.0, 5.0]"
+             color="0xFFFFFFFF" translation="[1470, 10]" />
+
+      <!-- Error/status message -->
+      <Label id="statusMsg" text="" color="0xFF5555FF"
+             translation="[60, 178]" width="1050" wrap="true" />
+
+      <!-- Yellow status/debug line -->
+      <Label id="debugMsg" text="" color="0xAAAAAAFF"
+             translation="[60, 136]" width="1050" />
+
+      <!-- Hours buttons (left) + delta/time (right) at y=220 -->
+      <Label text="Graph:" color="0x555577FF" translation="[60, 228]" />
+      <Rectangle id="s2h"  width="88" height="46" color="0x222244FF" translation="[160, 220]"><Label id="l2h"  text=" 2h" color="0x888888FF" translation="[10,10]" /></Rectangle>
+      <Rectangle id="s3h"  width="88" height="46" color="0x2244CCFF" translation="[258, 220]"><Label id="l3h"  text=" 3h" color="0xFFFFFFFF" translation="[10,10]" /></Rectangle>
+      <Rectangle id="s4h"  width="88" height="46" color="0x222244FF" translation="[356, 220]"><Label id="l4h"  text=" 4h" color="0x888888FF" translation="[10,10]" /></Rectangle>
+      <Rectangle id="s6h"  width="88" height="46" color="0x222244FF" translation="[454, 220]"><Label id="l6h"  text=" 6h" color="0x888888FF" translation="[10,10]" /></Rectangle>
+      <Rectangle id="s12h" width="88" height="46" color="0x222244FF" translation="[552, 220]"><Label id="l12h" text="12h" color="0x888888FF" translation="[10,10]" /></Rectangle>
+      <Rectangle id="s24h" width="88" height="46" color="0x222244FF" translation="[650, 220]"><Label id="l24h" text="24h" color="0x888888FF" translation="[10,10]" /></Rectangle>
+
+      <Label id="deltaLabel" text="" color="0xCCCCCCFF"
+             translation="[1400, 220]" horizAlign="right" width="460" />
+      <Label id="timeLabel"  text="" color="0x666688FF"
+             translation="[1400, 258]" horizAlign="right" width="460" />
+
+      <!-- Graph group -->
+      <Group id="graphGroup" translation="[60, 310]" />
+
+      <!-- Pill row: IAGE CAGE SAGE BAGE - individual labels for per-pill color -->
+      <Label id="iageLabel" text="" color="0x88FF88FF"
+             font="font:SmallestSystemFont" translation="[10,  980]" />
+      <Label id="cageLabel" text="" color="0x88FF88FF"
+             font="font:SmallestSystemFont" translation="[206, 980]" />
+      <Label id="sageLabel" text="" color="0x88FF88FF"
+             font="font:SmallestSystemFont" translation="[402, 980]" />
+      <Label id="bageLabel" text="" color="0x88FF88FF"
+             font="font:SmallestSystemFont" translation="[598, 980]" />
+
+      <!-- Clock: right side, below graph x-axis, above footer, scale 4x -->
+      <Label id="clockLabel" text=""
+             font="font:LargeBoldSystemFont"
+             scaleRotateCenter="[0,0]" scale="[4.0, 4.0]"
+             color="0x888888FF" translation="[1370, 870]" />
+
+      <Label text="Left/Right = Graph Window (in app mode)   OK = Refresh   Back = Exit   Settings: Roku Settings > Theme > Screensaver"
+             color="0x2A2A44FF" translation="[60, 1020]" />
+    </Rectangle>
+
+  </children>
+</component>

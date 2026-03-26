@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="NightscoutSetup" extends="Scene">
+  <script type="text/brightscript" uri="pkg:/components/NightscoutSetup.brs" />
+  <children>
+    <Rectangle id="bg" width="1920" height="1080" color="0x0F0F1EFF">
+
+      <Label text="NightscoutTV for Roku: Settings"
+             font="font:LargeBoldSystemFont" color="0xFFFFFFFF"
+             translation="[80, 60]" />
+
+      <Rectangle id="focusBar" width="1760" height="60"
+                 color="0x2244AACC" translation="[80, 168]" />
+
+      <!-- Row 0: URL -->
+      <Label text="Nightscout URL"  color="0x8888AAFF" translation="[80, 148]" />
+      <Label id="urlDisplay" text="https://" color="0xFFFFFFFF" translation="[340, 178]" />
+
+      <!-- Row 1: Token -->
+      <Label text="Access Token"   color="0x8888AAFF" translation="[80, 248]" />
+      <Label id="tokenDisplay" text="(blank)" color="0xFFFFFFFF" translation="[340, 278]" />
+
+      <!-- Row 2: Units -->
+      <Label text="Units" color="0x8888AAFF" translation="[80, 348]" />
+      <Rectangle id="chkMgBox" width="32" height="32" color="0x2244AAFF" translation="[340, 354]">
+        <Label id="chkMgMark" text="X" color="0xFFFFFFFF" translation="[7, 4]" />
+      </Rectangle>
+      <Label text="mg/dL"  color="0xFFFFFFFF" translation="[384, 354]" />
+      <Rectangle id="chkMmolBox" width="32" height="32" color="0x333355FF" translation="[500, 354]">
+        <Label id="chkMmolMark" text=""  color="0xFFFFFFFF" translation="[7, 4]" />
+      </Rectangle>
+      <Label text="mmol/L" color="0xFFFFFFFF" translation="[544, 354]" />
+
+      <!-- Row 3: Default Display duration -->
+      <Label text="Default Display" color="0x8888AAFF" translation="[80, 448]" />
+      <Label text="&lt;" color="0x888888FF" translation="[340, 458]" />
+      <Label id="hoursDisplay" text="3h" color="0xFFFFFFFF" translation="[370, 458]" />
+      <Label text="&gt;" color="0x888888FF" translation="[430, 458]" />
+      <Label text="Left/Right to change" color="0x444466FF" translation="[470, 458]" />
+
+      <!-- Row 4: Bolus Display Threshold -->
+      <Label text="Bolus Threshold" color="0x8888AAFF" translation="[80, 548]" />
+      <Label text="&lt;" color="0x888888FF" translation="[340, 558]" />
+      <Label id="bolusDisplay" text=">= 0.5 U" color="0xFFFFFFFF" translation="[370, 558]" />
+      <Label text="&gt;" color="0x888888FF" translation="[510, 558]" />
+      <Label text="Left/Right to change" color="0x444466FF" translation="[550, 558]" />
+
+      <!-- Row 5: Basal Render -->
+      <Label text="Render Basal" color="0x8888AAFF" translation="[80, 648]" />
+      <Label text="&lt;" color="0x888888FF" translation="[340, 658]" />
+      <Label id="basalDisplay" text="Icicle" color="0xFFFFFFFF" translation="[370, 658]" />
+      <Label text="&gt;" color="0x888888FF" translation="[700, 658]" />
+      <Label text="Left/Right to change" color="0x444466FF" translation="[750, 658]" />
+
+      <!-- Row 6: Save button -->
+      <Rectangle id="saveBtn" width="280" height="60"
+                 color="0x226622FF" translation="[340, 738]">
+        <Label text="Save" color="0xFFFFFFFF" translation="[40, 14]" />
+      </Rectangle>
+
+      <Label id="setupStatus" text="" color="0xFF6655FF" translation="[80, 840]" />
+
+      <Label text="Up/Down = move   OK = edit   Left/Right = change default hours   Back = cancel &amp; close"
+             color="0x444466FF" translation="[80, 1020]" />
+    </Rectangle>
+
+    <!-- Disclaimer overlay: shown for 8s on first open, then hidden -->
+    <Rectangle id="disclaimerOverlay" width="1920" height="1080"
+               color="0x000000FF" visible="true">
+      <Poster id="disclaimerPoster" uri="pkg:/images/splash_hd.png"
+              width="1920" height="1080" />
+    </Rectangle>
+
+  </children>
+</component>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="NightscoutTask" extends="Task">
+  <interface>
+    <field id="action"         type="string"     value="load" />
+    <field id="nsUrl"          type="string"     value="" />
+    <field id="nsToken"        type="string"     value="" />
+    <field id="unitsMgdl"      type="boolean"    value="true" />
+    <field id="graphHours"     type="integer"    value="3" />
+    <field id="settingsToSave" type="assocarray" />
+    <field id="settingsLoaded" type="assocarray" alwaysNotify="true" />
+    <field id="result"         type="assocarray" alwaysNotify="true" />
+    <field id="profile"        type="assocarray" alwaysNotify="true" />
+    <field id="basalSchedule"  type="string"     value="" alwaysNotify="true" />
+    <field id="nsCustomTitle"  type="string"     value="__unset__" alwaysNotify="true" />
+    <field id="enabledPlugins"   type="string"     value=""          alwaysNotify="true" />
+    <field id="timeFormat"       type="integer"    value="12"        alwaysNotify="true" />
+    <field id="pillThresholds"   type="string"     value=""          alwaysNotify="true" />
+    <field id="batteryPct"       type="integer"    value="-1"        alwaysNotify="true" />
+    <field id="pills"          type="string"     value=""          alwaysNotify="true" />
+    <field id="bolusMinU"      type="float"      value="0.5" />
+    <field id="basalRender"    type="string"     value="icicle" />
+    <field id="basals"         type="string"     value="" alwaysNotify="true" />
+    <field id="treatments"     type="string"     value="" alwaysNotify="true" />
+  </interface>
+  <script type="text/brightscript" uri="pkg:/components/NightscoutTask.brs" />
+</component>
