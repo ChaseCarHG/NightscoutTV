@@ -14,18 +14,16 @@ NIGHTSCOUT #WeAreNotWaiting
 The Roku platform is neither Safety-Grade nor Medical Grade. People change the channel. For a dedicated display, consider a SugarPixel from https://customtypeone.com/products/sugarpixel  
   
 PREREQUISITES  
-1. Fully-operational Nightscout server setup per https://nightscout.github.io/, with:   
+1. Fully-operational Nightscout server setup per https://nightscout.github.io/, with:    
    a. HTTPS:// access URL.  
    b. Access token with "readable" permission.  
+      • To set up an access token, navigate to your Nightscout URL, authenticate, then top-right Hamburger Icon > Admin Tools > Subjects > Add New Subject > Name "roku", Roles "READABLE" > Click Save button.  
    c. Uploader sending it at least Continuous Glucose Monitor Information (Recommended: Nighscout Foundation's XDrip+ from https://github.com/nightscoutfoundation/xdrip)   
    d. (Optional) Other uploaders contributing information, e.g. jwoglom-tconnectsync from https://github.com/jwoglom/tconnectsync  
   
 INSTALLATION  
 1. Download all files  
-2. (Optional) To ease on-TV setup, consider editing NightscoutSetup.brs at these lines:  
-   a. At ~Line 245: At kbd.text = "https://www." change the string to your Nightscout Server URL with NO trailing slash.  
-   b. At ~Line 261: At kbd.text = "" change the string to your Access Token that is assigned the READABLE role.  
-       To set up an access token, navigate to your Nightscout URL, authenticate, then top-right Hamburger Icon > Admin Tools > Subjects > Add New Subject > Name "roku", Roles "READABLE" > Click Save button.  
+2. (Optional) To ease on-TV setup, consider editing NightscoutSetup.brs at the two lines labeled "'CUSTOMIZE STRING BELOW TO EASE ROKU OSK INPUTS".  
 3. Zip all files, ensuring the .Zip archive root folder contains the 1 file ("manifest") and the three directories ("components", "images", & "source")   
 4. To sideload-install the Zip file, refer to https://developer.roku.com/docs/developer-program/getting-started/developer-setup.md  
    a. NOTE: Roku platform limitations prevent sideload-installed apps from providing user access to the Screensaver Settings menu option.  
