@@ -52,6 +52,7 @@ PENDING INITIAL TESTING
 • BAGE  
   
 MORE DISCLAIMERS  
+• Unfortunately, there's no Webkit or similar on Roku, so it all has to be made using Roku's available programming.  
 • This software was written mostly by Claude AI. While it seems to me to be completely functional in my testing, and a good match to my Nightscout client, it is Alpha software written by AI. 
   So, VALIDATE IT BEFORE MAKING DECISIONS ON IT.   
 • Over time, I intend to review all code manually, after which point we'll call the software "released" or V1.0.
