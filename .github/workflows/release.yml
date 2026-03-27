@@ -1,0 +1,30 @@
+name: Build and Release NightscoutTV
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build clean zip
+        run: |
+          zip -r NightscoutTV.zip \
+            manifest \
+            source/ \
+            components/ \
+            images/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: NightscoutTV.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
