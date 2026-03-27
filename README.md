@@ -24,16 +24,17 @@ PREREQUISITES
    d. (Optional) Other uploaders contributing information, e.g. jwoglom-tconnectsync from https://github.com/jwoglom/tconnectsync  
   
 INSTALLATION  
-1. Download all files  
-2. (Optional) To ease on-TV setup, consider editing NightscoutSetup.brs at the two lines labeled "'CUSTOMIZE STRING BELOW TO EASE ROKU OSK INPUTS".  
-3. Zip all files. 7-Zip works fine with Compression Level 9-Ultra. Just ensure the .Zip archive root folder contains the 1 file ("manifest") and the three directories ("components", "images", & "source").
-4. To sideload-install the Zip file, refer to https://developer.roku.com/docs/developer-program/getting-started/developer-setup.md  
+1. Download all files -- recommend the "Releases" section on the right.  
+   a. (Optional, recommended for developers) To ease on-TV setup, consider editing NightscoutSetup.brs at the two lines labeled "'CUSTOMIZE STRING BELOW TO EASE ROKU OSK INPUTS".  
+      Afterwards, ensure all files re-zipped. (7-Zip works fine with Compression Level 9-Ultra.)
+      Just ensure the .Zip archive root folder contains the 1 file ("manifest") and the 3 directories ("components", "images", & "source")).
+2. To sideload-install the Zip file, refer to https://developer.roku.com/docs/developer-program/getting-started/developer-setup.md  
    a. NOTE: Roku platform limitations prevent sideload-installed apps from providing user access to the Screensaver Settings menu option.  
             However, the Screensaver Settings menu option DOES display upon initial app sideloading.  
             Therefore, to return to Screensaver Settings, remove then re-sideload-install NightscoutTV on your Roku device.  
             This limitation will remain until the app graduates from Alpha version, when I'll publish the Beta version in the Roku App Store (free just like Nightscout).  
-5. Observe the 8-second disclaimer splash screen, which says the same as the "DISCLAIMERS" section above.  
-6. Configure the Setup screen IMMEDIATELY after the disclaimer splash screen disappears, due to Note 4.a. above.  
+3. Observe the 8-second disclaimer splash screen, which says the same as the "DISCLAIMERS" section above.  
+4. Configure the Setup screen IMMEDIATELY after the disclaimer splash screen disappears, due to Note 4.a. above.  
    a. NOTE: Remember the optional Step 2 can ease this process!  
   
 USAGE  
