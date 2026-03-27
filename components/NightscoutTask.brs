@@ -42,7 +42,7 @@ sub doLoadSettings()
     mgdl = true
     if units = "mmol" then mgdl = false
 
-    bolusMin    = regRead("bolusMinU")   : if bolusMin    = "" then bolusMin    = "0.5"
+    bolusMin    = regRead("bolusMinU")   : if bolusMin    = "" then bolusMin    = "0.1"
     basalRender = regRead("basalRender") : if basalRender = "" then basalRender = "icicle"
     m.top.settingsLoaded = {
         url:         url,
