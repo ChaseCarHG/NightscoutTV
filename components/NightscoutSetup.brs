@@ -19,14 +19,15 @@ sub init()
     m.discTimer          = CreateObject("roSGNode", "Timer")
     m.discTimer.duration = 8
     m.discTimer.repeat   = false
-    m.discTimer.observeField("fire", "onDisclaimerTimer")
+    m.discTimer.observeFieldScoped("fire", "onDisclaimerTimer")
     m.discTimer.control  = "start"
 
+    m.saveTask      = invalid
     m.nsUrl         = ""
     m.nsToken       = ""
     m.unitsMgdl     = true
     m.graphHours    = 3
-    m.bolusMinU     = 0.5
+    m.bolusMinU     = 0.1
     m.basalRender   = "icicle"
     m.focusRow      = 0
     m.dialogPurpose = ""
@@ -178,7 +179,7 @@ end sub
 
 sub cycleBolus(dir as String)
     opts = [0.0, 0.1, 0.5, 1.0, 5.0]
-    idx  = 2  ' default to 0.5
+    idx  = 1  ' default to 0.1
     for i = 0 to opts.Count() - 1
         if opts[i] = m.bolusMinU then idx = i
     end for
@@ -241,16 +242,15 @@ sub showUrlDialog()
     kbd.title   = "Nightscout URL"
     kbd.message = "Include https:// -- no trailing slash needed"
     kbd.buttons = ["Save", "Cancel"]
+    kbd.observeFieldScoped("buttonSelected", "onDialogButton")
+    m.top.dialog = kbd
+    ' Set text AFTER dialog is live so cursor lands at end
     if m.nsUrl = ""
-        'CUSTOMIZE STRING BELOW TO EASE ROKU OSK INPUTS
-        kbd.text = "https://www."
-		'BE SURE TO OMIT AKA SKIP THE TRAILING SLASH
+        ' CUSTOMIZE STRING BELOW TO EASE ROKU OSK INPUTS
+        m.top.dialog.text = "https://www."
     else
-        kbd.text = m.nsUrl
+        m.top.dialog.text = m.nsUrl
     end if
-    kbd.observeField("buttonSelected", "onDialogButton")
-    m.top.dialog      = kbd
-    m.top.dialog.text = kbd.text
 end sub
 
 sub showTokenDialog()
@@ -259,15 +259,15 @@ sub showTokenDialog()
     kbd.title   = "Access Token"
     kbd.message = "Leave blank if no token is required."
     kbd.buttons = ["Save", "Cancel"]
+    kbd.observeFieldScoped("buttonSelected", "onDialogButton")
+    m.top.dialog = kbd
+    ' Set text AFTER dialog is live so cursor lands at end
     if m.nsToken = ""
-        'CUSTOMIZE STRING BELOW TO EASE ROKU OSK INPUTS
-        kbd.text = ""
+        ' CUSTOMIZE STRING BELOW TO EASE ROKU OSK INPUTS
+        m.top.dialog.text = ""
     else
-        kbd.text = m.nsToken
+        m.top.dialog.text = m.nsToken
     end if
-    kbd.observeField("buttonSelected", "onDialogButton")
-    m.top.dialog      = kbd
-    m.top.dialog.text = kbd.text
 end sub
 
 sub onDialogButton()
@@ -295,6 +295,7 @@ sub onDialogButton()
 end sub
 
 sub saveSettings()
+    if m.saveTask <> invalid then m.saveTask.control = "STOP" : m.saveTask = invalid
     t = CreateObject("roSGNode", "NightscoutTask")
     t.settingsToSave = {
         url:         m.nsUrl,
