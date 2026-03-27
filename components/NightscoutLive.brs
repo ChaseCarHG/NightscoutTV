@@ -13,7 +13,8 @@ sub init()
     m.bgValue     = m.top.findNode("bgValue")
     m.trendLabel  = m.top.findNode("trendLabel")
     m.deltaLabel  = m.top.findNode("deltaLabel")
-    m.timeLabel   = m.top.findNode("timeLabel")
+    m.timeLabelBold = m.top.findNode("timeLabelBold")
+    m.timeLabelAge  = m.top.findNode("timeLabelAge")
     m.statusMsg   = m.top.findNode("statusMsg")
     m.graphGroup  = m.top.findNode("graphGroup")
     m.customTitle = m.top.findNode("customTitle")
@@ -54,28 +55,41 @@ sub init()
     m.basalSchedule  = []
     m.combinedBasals = []
     m.lastEntries    = []
+    m.lastResult     = invalid
 
+    ' Task node refs - initialized to invalid so cleanup guards work first run
+    m.fetchTask   = invalid
+    m.statusTask  = invalid
+    m.basalTask   = invalid
+    m.treatTask   = invalid
+    m.deviceTask  = invalid
+    m.pillTask    = invalid
+    m.profileTask = invalid
+    m.saveTask    = invalid
+
+    ' 60s refresh timer
     m.timer          = CreateObject("roSGNode", "Timer")
     m.timer.duration = 60
     m.timer.repeat   = true
-    m.timer.observeField("fire", "onTimer")
+    m.timer.observeFieldScoped("fire", "onTimer")
+    m.timer.control  = "start"
 
     m.poll          = CreateObject("roSGNode", "Timer")
     m.poll.duration = 3
     m.poll.repeat   = true
-    m.poll.observeField("fire", "onPoll")
+    m.poll.observeFieldScoped("fire", "onPoll")
 
     ' -- Load settings on startup --
-    m.task = CreateObject("roSGNode", "NightscoutTask")
-    m.task.observeFieldScoped("settingsLoaded", "onSettingsLoaded")
-    m.task.action  = "load"
-    m.task.control = "RUN"
+    m.loadTask = CreateObject("roSGNode", "NightscoutTask")
+    m.loadTask.observeFieldScoped("settingsLoaded", "onSettingsLoaded")
+    m.loadTask.action  = "load"
+    m.loadTask.control = "RUN"
 
     m.top.setFocus(true)
 end sub
 
 sub onSettingsLoaded()
-    s = m.task.settingsLoaded
+    s = m.loadTask.settingsLoaded
     if s = invalid then return
     m.nsUrl      = s.url
     m.nsToken    = s.token
@@ -165,6 +179,7 @@ end sub
 
 
 sub doFetchStatus()
+    if m.statusTask <> invalid then m.statusTask.control = "STOP" : m.statusTask = invalid
     t = CreateObject("roSGNode", "NightscoutTask")
     m.statusTask = t
     t.observeFieldScoped("nsCustomTitle",  "onStatus")
@@ -192,6 +207,7 @@ sub doFetchBasals()
         m.basals = []
         return
     end if
+    if m.basalTask <> invalid then m.basalTask.control = "STOP" : m.basalTask = invalid
     t = CreateObject("roSGNode", "NightscoutTask")
     m.basalTask = t
     t.observeFieldScoped("basals", "onBasals")
@@ -351,6 +367,7 @@ sub doFetchTreatments()
         m.treatments = []
         return
     end if
+    if m.treatTask <> invalid then m.treatTask.control = "STOP" : m.treatTask = invalid
     t = CreateObject("roSGNode", "NightscoutTask")
     m.treatTask = t
     t.observeFieldScoped("treatments", "onTreatments")
@@ -395,6 +412,7 @@ end function
 
 sub doFetchDeviceStatus()
     if not pluginEnabled("bage") then return
+    if m.deviceTask <> invalid then m.deviceTask.control = "STOP" : m.deviceTask = invalid
     t = CreateObject("roSGNode", "NightscoutTask")
     m.deviceTask = t
     t.observeFieldScoped("batteryPct", "onBatteryPct")
@@ -436,6 +454,7 @@ sub onPillThresholds()
 end sub
 
 sub doFetchPills()
+    if m.pillTask <> invalid then m.pillTask.control = "STOP" : m.pillTask = invalid
     t = CreateObject("roSGNode", "NightscoutTask")
     m.pillTask = t
     t.observeFieldScoped("pills", "onPills")
@@ -557,12 +576,13 @@ sub startClock()
     m.clockTimer          = CreateObject("roSGNode", "Timer")
     m.clockTimer.duration = secsLeft
     m.clockTimer.repeat   = false
-    m.clockTimer.observeField("fire", "onClockTick")
+    m.clockTimer.observeFieldScoped("fire", "onClockTick")
     m.clockTimer.control  = "start"
 end sub
 
 sub onClockTick()
     updateClock()
+    updateAgeText(m.lastResult)
     ' Now switch to a steady 60s repeating timer
     m.clockTimer.duration = 60
     m.clockTimer.repeat   = true
@@ -606,6 +626,7 @@ function pillColor(epochSec as Integer, nowSec as Integer, warnHrs as Integer, u
 end function
 
 sub doFetchProfile()
+    if m.profileTask <> invalid then m.profileTask.control = "STOP" : m.profileTask = invalid
     t = CreateObject("roSGNode", "NightscoutTask")
     m.profileTask = t
     t.observeFieldScoped("profile",       "onProfile")
@@ -680,6 +701,7 @@ sub doFetch()
     m.statusMsg.text    = "Fetching..."
     m.debugMsg.text     = "URL: " + m.nsUrl
     m.lastDebugInfo     = ""
+    if m.fetchTask <> invalid then m.fetchTask.control = "STOP" : m.fetchTask = invalid
     t = CreateObject("roSGNode", "NightscoutTask")
     t.observeFieldScoped("result", "onResult")
     t.action     = "fetch"
@@ -688,31 +710,41 @@ sub doFetch()
     t.unitsMgdl  = m.unitsMgdl
     t.graphHours = m.graphHours
     t.control    = "RUN"
-    m.task       = t
-    m.poll.control = "start"
+    m.fetchTask  = t
 end sub
 
 sub onTimer()
     doFetch()
 end sub
 
-' Polling fallback -- fires every 3s, reads task.result directly
-sub onPoll()
-    if m.task = invalid then return
-    r = m.task.result
+sub updateAgeText(r as Object)
     if r = invalid then return
-    ' Only process if result has changed since last poll
-    token = r.debugInfo + r.error
-    if token = "" then return
-    if token = m.lastDebugInfo then return
-    m.lastDebugInfo = token
-    m.poll.control = "stop"
-    m.debugMsg.text = "POLL GOT RESULT: " + token
-    processResult(r)
+    dt = CreateObject("roDateTime")
+    dt.Mark()
+    ' Use local time (same offset as clock) so "N minutes ago" matches clock display
+    localNowSec  = dt.AsSeconds() + m.utcOffMin * 60
+    localAgeSec  = r.ageSec      + m.utcOffMin * 60
+    ' Truncate both to minute boundaries, then diff - matches what clock shows
+    ageMins = (localNowSec \ 60) - (localAgeSec \ 60)
+    if ageMins < 1
+        agoStr = "(just now)"
+    else if ageMins = 1
+        agoStr = "(1 minute ago)"
+    else
+        agoStr = "(" + ageMins.ToStr() + " minutes ago)"
+    end if
+    m.timeLabelBold.text = "Last: " + r.timeStr
+    m.timeLabelAge.text  = agoStr
+end sub
+
+' Poll fallback - kept as no-op; real result delivery via observeFieldScoped
+sub onPoll()
 end sub
 
 sub onResult()
-    r = m.task.result
+    if m.fetchTask = invalid then return
+    r = m.fetchTask.result
+    if r = invalid then return
     processResult(r)
 end sub
 
@@ -751,19 +783,9 @@ sub processResult(r as Object)
         end if
     end if
 
-    ' Timestamp with age
-    dt = CreateObject("roDateTime")
-    dt.Mark()
-    nowSec  = dt.AsSeconds()
-    ageMins = int((nowSec - r.ageSec) / 60)
-    if ageMins < 1
-        agoStr = "(just now)"
-    else if ageMins = 1
-        agoStr = "(1 minute ago)"
-    else
-        agoStr = "(" + ageMins.ToStr() + " minutes ago)"
-    end if
-    m.timeLabel.text = "Last: " + r.timeStr + "  " + agoStr
+    ' Timestamp with age - updated on refresh and on each clock tick
+    m.lastResult = r
+    updateAgeText(r)
 
     ' Status line, like this: "OK.  102 mg/dL.  Values Loaded: 42."
     unitStr = "mg/dL"
@@ -810,6 +832,7 @@ end sub
 ' SAVE SETTINGS (via Task)
 ' -----------------------------------------------------------------
 sub saveSettings()
+    if m.saveTask <> invalid then m.saveTask.control = "STOP" : m.saveTask = invalid
     t = CreateObject("roSGNode", "NightscoutTask")
     t.settingsToSave = {
         url:        m.nsUrl,
