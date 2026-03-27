@@ -54,8 +54,12 @@
 
       <Label id="deltaLabel" text="" color="0xCCCCCCFF"
              translation="[1400, 220]" horizAlign="right" width="460" />
-      <Label id="timeLabel"  text="" color="0x666688FF"
-             translation="[1400, 258]" horizAlign="right" width="460" />
+      <Label id="timeLabelBold" text="" color="0x666688FF"
+             font="font:MediumBoldSystemFont"
+             translation="[1300, 258]" horizAlign="right" width="220" />
+      <Label id="timeLabelAge"  text="" color="0x666688FF"
+             font="font:MediumSystemFont"
+             translation="[1530, 258]" horizAlign="right" width="330" />
 
       <!-- Graph group -->
       <Group id="graphGroup" translation="[60, 310]" />
