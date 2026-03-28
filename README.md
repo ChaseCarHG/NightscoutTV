@@ -24,7 +24,7 @@ PREREQUISITES
    d. (Optional) Other uploaders contributing information, e.g. jwoglom-tconnectsync from https://github.com/jwoglom/tconnectsync  
   
 INSTALLATION  
-1. Download all files -- recommend the "Releases" section on the right.  
+1. Download all files -- recommend the "Releases" section on the right. Download the "NightscoutTV.zip" file (NOT the source code zip). 
    a. (Optional, recommended for developers) To ease on-TV setup, consider editing NightscoutSetup.brs at the two lines labeled "'CUSTOMIZE STRING BELOW TO EASE ROKU OSK INPUTS".  
       Afterwards, ensure all files re-zipped. (7-Zip works fine with Compression Level 9-Ultra.)
       Just ensure the .Zip archive root folder contains the 1 file ("manifest") and the 3 directories ("components", "images", & "source")).
@@ -54,8 +54,6 @@ PENDING INITIAL TESTING
 • IAGE  
 • BAGE  
   
-MORE DISCLAIMERS  
+MORE DETAILS  
 • Unfortunately, there's no Webkit or similar on Roku, so it all has to be made using Roku's available programming.  
-• This software was written mostly by Claude AI. While it seems to me to be completely functional in my testing, and a good match to my Nightscout client, it is Alpha software written by AI. 
-  So, VALIDATE IT BEFORE MAKING DECISIONS ON IT.   
-• Over time, I intend to review all code manually, after which point we'll call the software "released" or V1.0.
+• VALIDATE DATA RELIABILITY BEFORE MAKING DECISIONS ON IT. 
