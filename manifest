@@ -1,7 +1,7 @@
 title=NightscoutTV for Roku
 subtitle=CGM Live Display
 major_version=1
-minor_version=0
+minor_version=8
 build_version=00001
 mm_icon_focus_hd=pkg:/images/icon_focus_hd.png
 mm_icon_side_hd=pkg:/images/icon_side_hd.png
@@ -25,3 +25,5 @@ screensaver_private=0
 #   glucose values and trends
 # * Make sure you're ready to cope with an unexpected failure and always have
 #   alternative ways to check your blood glucose levels
+#
+# https://github.com/ChaseCarHG/NightscoutTV/wiki
