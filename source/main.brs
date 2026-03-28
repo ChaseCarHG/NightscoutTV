@@ -1,10 +1,11 @@
 ' main.brs
-' RunUserInterface      - launch from home screen; goes to setup if not configured, else live display
-' RunScreenSaver        - auto-launched by Roku screensaver timer; shows live display
-' RunScreenSaverSettings - Settings > Screensaver > NightscoutTV for Roku > Settings (production)
+' RunUserInterface       - Launch from home screen; goes to setup if not configured, else live display
+' RunScreenSaver         - Auto-launched by Roku screensaver timer; shows live display
+' RunScreenSaverSettings - Settings > Themes > Screensaver > NightscoutTV for Roku > Settings (production)
 
 sub RunUserInterface()
-    ' Check if URL is configured; if not, go straight to setup
+    ' Launch from home screen; goes to setup if not configured, else live display
+    ' First, check if URL is configured; if not, go straight to setup
     sec = CreateObject("roRegistrySection", "nightscout")
     if sec.Exists("url") and sec.Read("url") <> ""
         runLive()
@@ -19,14 +20,17 @@ sub RunScreenSaver()
 end sub
 
 sub RunScreenSaverSettings()
+    ' Settings > Themes > Screensaver > NightscoutTV for Roku > Settings (production)
+    ' Auto-launched by Roku screensaver timer; shows live display
     runSetup()
 end sub
 
 sub runLive()
+    ' Run the Live Display Graph Screen
     screen = CreateObject("roSGScreen")
     port   = CreateObject("roMessagePort")
     screen.setMessagePort(port)
-    screen.CreateScene("NightscoutLive")
+    screen.CreateScene("NightscoutLive") 'Uses Components NightscoutLive.brs and .xml
     screen.show()
     while true
         msg = wait(0, port)
@@ -38,10 +42,11 @@ end sub
 
 
 sub runSetup()
+    ' Run the Setup Screen
     screen = CreateObject("roSGScreen")
     port   = CreateObject("roMessagePort")
     screen.setMessagePort(port)
-    screen.CreateScene("NightscoutSetup")
+    screen.CreateScene("NightscoutSetup") 'Uses Components NightscoutSetup.brs and .xml
     screen.show()
     while true
         msg = wait(0, port)
