@@ -1,6 +1,13 @@
 ' NightscoutSetup.brs
 ' Row 0=URL, Row 1=Token, Row 2=Units, Row 3=Default Display, Row 4=Bolus Threshold, Row 5=Save
 
+' All of these memory management APIs ARE used in source/main.brs:
+'   EnableLowGeneralMemoryEvent
+'   EnableMemoryWarningEvent
+'   GetMemoryLimitPercent
+'   GetChannelMemoryLimit
+'   GetChannelAvailableMemory
+
 sub init() ' Runs when scene is created. 
     ' First, grab node references. 
     ' Each walks the XML tree and returns a live reference to the named node, to store in the m.* variable.
