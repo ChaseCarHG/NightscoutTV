@@ -1,4 +1,4 @@
-' NightscoutScene.brs
+' NightscoutLive.brs
 ' Setup screen: Up/Down to move focus between rows, OK to activate.
 ' Row 0 = URL (StandardKeyboardDialog, pre-filled with "https://")
 ' Row 1 = Token (StandardKeyboardDialog)
