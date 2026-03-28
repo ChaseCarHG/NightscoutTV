@@ -19,6 +19,13 @@
 '
 ' https://github.com/ChaseCarHG/NightscoutTV/wiki
 
+' All of these memory management APIs ARE used in source/main.brs:
+'   EnableLowGeneralMemoryEvent
+'   EnableMemoryWarningEvent
+'   GetMemoryLimitPercent
+'   GetChannelMemoryLimit
+'   GetChannelAvailableMemory
+
 sub init()
     m.timer          = CreateObject("roSGNode", "Timer")
     m.timer.duration = 8
