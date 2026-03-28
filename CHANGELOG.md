@@ -1,5 +1,11 @@
 CHANGELOG
 
+SATURDAY 28 Mar 2026 - V0.8.00005-Alpha   
+  PUBLICATION  
+  • Resolved LOADS of Roku Store Errors & Warnings.   
+  • Added low memory Warning & Event detection, and output to debugging log at RokuIP:8085 using RAW.  
+  • Version Number will now display accurately within the Roku UI.  
+
 SATURDAY 28 Mar 2026 - V0.8.00004-Alpha 
   DEFAULTS  
   • Default display timespan - changed from 3 hours to 4 hours in all places.   
