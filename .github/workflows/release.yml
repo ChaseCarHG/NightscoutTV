@@ -19,7 +19,7 @@ jobs:
             CHANGELOG.MD \
             README.MD \
             SECURITY.MD \
-            LICENSE \ 
+            LICENSE \
             manifest \
             source/ \
             components/ \
