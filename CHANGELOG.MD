@@ -1,6 +1,6 @@
 CHANGELOG
 
-SATURDAY 28 Mar 2026 - V0.8.00001-Alpha  
+SATURDAY 28 Mar 2026 - V0.8.00002-Alpha 
   DEFAULTS  
   • Default display timespan - changed from 3 hours to 4 hours in all places.   
     - All initial on-screen settings remain configurable.   
