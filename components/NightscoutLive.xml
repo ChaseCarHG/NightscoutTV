@@ -5,17 +5,17 @@
 
     <!-- =========================================================
          LIVE DISPLAY
-         y=20  : App title (left) + BG value + trend (right)
-         y=62  : Custom title from Nightscout
-         y=108 : Yellow status / debug line
-         y=220 : Hours buttons (left) + delta/time (right)
-         y=310 : Graph group
-         y=1050: Footer hint
+         y=20   : App title (left) + BG value + trend (right)
+         y=62   : Custom title from Nightscout
+         y=108  : Yellow status / debug line
+         y=220  : Hours buttons (left) + delta/time (right)
+         y=310  : Graph group
+         y=1050 : Footer hint
     ========================================================= -->
     <Rectangle id="mainScreen" width="1920" height="1080"
                color="0x08080EFF">
 
-      <!-- Static app title top-left -->
+      <!-- Static app title top-left (static text) -->
       <Label text="NightscoutTV for Roku"
              font="font:MediumBoldSystemFont"
              color="0xFFFFFFFF" translation="[60, 48]" />
@@ -25,7 +25,7 @@
              font="font:MediumBoldSystemFont"
              color="0xFFFFFFFF" translation="[60, 90]" />
 
-      <!-- BG value + trend: large, top-right, scale 5x -->
+      <!-- CGM Value + Trend Arrow ASCII Art: large, top-right, scale 5x -->
       <Label id="bgValue"    text="---"
              font="font:LargeBoldSystemFont"
              scaleRotateCenter="[0,0]" scale="[5.0, 5.0]"
@@ -39,12 +39,12 @@
       <Label id="statusMsg" text="" color="0xFF5555FF"
              translation="[60, 178]" width="1050" wrap="true" />
 
-      <!-- Yellow status/debug line -->
+      <!-- Gray or Yellow status/debug line -->
       <Label id="debugMsg" text="" color="0xAAAAAAFF"
              translation="[60, 136]" width="1050" />
 
       <!-- Hours buttons (left) + delta/time (right) at y=220 -->
-      <Label text="Graph:" color="0x555577FF" translation="[60, 228]" />
+      <Label text="Graph:" color="0x555577FF" translation="[60, 228]" /> <!-- Caution to the Programmer: Label ids below start with l as in LIMA ! It is NOT 112 or 124. -->
       <Rectangle id="s2h"  width="88" height="46" color="0x222244FF" translation="[160, 220]"><Label id="l2h"  text=" 2h" color="0x888888FF" translation="[10,10]" /></Rectangle>
       <Rectangle id="s3h"  width="88" height="46" color="0x2244CCFF" translation="[258, 220]"><Label id="l3h"  text=" 3h" color="0xFFFFFFFF" translation="[10,10]" /></Rectangle>
       <Rectangle id="s4h"  width="88" height="46" color="0x222244FF" translation="[356, 220]"><Label id="l4h"  text=" 4h" color="0x888888FF" translation="[10,10]" /></Rectangle>
@@ -75,6 +75,7 @@
              font="font:SmallestSystemFont" translation="[598, 980]" />
 
       <!-- Clock: right side, below graph x-axis, above footer, scale 4x -->
+      <!-- Todo: Ensure this is aligned-right -->
       <Label id="clockLabel" text=""
              font="font:LargeBoldSystemFont"
              scaleRotateCenter="[0,0]" scale="[4.0, 4.0]"
