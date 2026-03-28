@@ -184,21 +184,29 @@ end function
 ' DISPLAY REFRESH
 ' -----------------------------------------------------------------
 
-
-
-
 sub refreshHourBtns()
     ' Highlight correct hour button for graph timescale. 
     ' Walks all six hour buttons and colors the active one bright blue and white, and the others dim. 
+	'  
+    ' In screensaver mode, dim unselected buttons further to reduce appearance  of interactive UI elements. 
+    ' Selected button stays visible as it shows current graph timespan - informational, not interactive.
     opts = ["2", "3", "4", "6", "12", "24"]
     for each h in opts
-        pair = m.hourBtns[h] ' Retrieves the rect, label pair for each hour string. 
+        pair = m.hourBtns[h]
         if h.ToInt() = m.graphHours
+            ' Selected button: always fully visible regardless of mode
             pair[0].color = "0x2244CCFF"
             pair[1].color = "0xFFFFFFFF"
         else
-            pair[0].color = "0x222244FF"
-            pair[1].color = "0x888888FF"
+            if m.global.isScreensaver = true
+                ' Screensaver mode: nearly invisible unselected buttons
+                pair[0].color = "0x0A0A1AFF"
+                pair[1].color = "0x1A1A2EFF"
+            else
+                ' App mode: normal dim unselected buttons
+                pair[0].color = "0x222244FF"
+                pair[1].color = "0x888888FF"
+            end if
         end if
     end for
 end sub
