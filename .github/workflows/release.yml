@@ -16,6 +16,10 @@ jobs:
       - name: Build clean zip
         run: |
           zip -r NightscoutTV.zip \
+            CHANGELOG.MD \
+            README.MD \
+            SECURITY.MD \
+            LICENSE \ 
             manifest \
             source/ \
             components/ \
