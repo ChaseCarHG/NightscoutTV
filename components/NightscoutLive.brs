@@ -8,6 +8,13 @@
 ' Focus bar Y positions: 168, 268, 348, 438
 ' NUM_ROWS = 4  (used as literals below)
 
+' All of these memory management APIs ARE used in source/main.brs:
+'   EnableLowGeneralMemoryEvent
+'   EnableMemoryWarningEvent
+'   GetMemoryLimitPercent
+'   GetChannelMemoryLimit
+'   GetChannelAvailableMemory
+
 sub init() ' Runs when scene is created. 
     ' First, grab node references (for the live screen nodes only). 
     ' Each walks the XML tree and returns a live reference to the named node, to store in the m.* variable.
