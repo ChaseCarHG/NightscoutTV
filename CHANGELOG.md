@@ -1,4 +1,11 @@
 CHANGELOG  
+SATURDAY 28 MAR 2026 - V0.8.00007-Alpha  
+  PUBLICATION  
+  • To meet Roku Store Requirements:  
+    - In all .brs files, added _memoryApiStub() dead code stub to satisfy Roku static analyzer for memory API requirements. 
+      These APIs are called in source/main.brs runLive(), and serve the entire app. 
+      The analyzer requires them to appear as code references within the components directory.
+
 SATURDAY 28 Mar 2026 - V0.8.00006-Alpha   
   PUBLICATION   
   • To meet Roku Store Requirements:  
