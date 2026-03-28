@@ -8,15 +8,15 @@ sub RunUserInterface()
     ' First, check if URL is configured; if not, go straight to setup
     sec = CreateObject("roRegistrySection", "nightscout")
     if sec.Exists("url") and sec.Read("url") <> ""
-        runLive()
+        runLive(false)
     else
         runSetup()
-        runLive()
+        runLive(false)
     end if
 end sub
 
 sub RunScreenSaver()
-    runLive()
+    runLive(true)
 end sub
 
 sub RunScreenSaverSettings()
@@ -25,12 +25,19 @@ sub RunScreenSaverSettings()
     runSetup()
 end sub
 
-sub runLive()
+sub runLive(isScreensaver as Boolean)
     ' Create the SceneGraph screen and message port. 
     ' The port receives all system events for this screen. 
     screen = CreateObject("roSGScreen")
     port   = CreateObject("roMessagePort")
     screen.setMessagePort(port)
+
+    ' Signal launch context to the scene via global node. 
+    ' Must be set BEFORE CreateScene so init() can read it immediately. 
+    ' isScreensaver=true hides interactive button hints in the footer, and display of other timespan options. 
+    glb = screen.getGlobalNode()
+    glb.addField("isScreensaver", "boolean", false)
+    glb.isScreensaver = isScreensaver
 
     ' Load and display the NightscoutLive scene component. 
     ' This triggers NightscoutLive.brs init() on the render thread. 
