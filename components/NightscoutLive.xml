@@ -81,7 +81,7 @@
              scaleRotateCenter="[0,0]" scale="[4.0, 4.0]"
              color="0x888888FF" translation="[1370, 870]" />
 
-      <Label id="footerHint" text="Left/Right = Graph Window (in app mode)   OK = Refresh   Back = Exit   Settings: Roku Settings > Theme > Screensaver"
+      <Label id="footerHint" text="Left/Right = Graph Timespan   OK = Refresh   Back = Exit   Settings: Roku Settings > Theme > Screensaver"
              color="0x2A2A44FF" translation="[60, 1020]" />
     </Rectangle>
 
