@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<component name="NightscoutSetup" extends="Scene">
-  <script type="text/brightscript" uri="pkg:/components/NightscoutSetup.brs" />
+<component name="NightscoutSetup" extends="Scene"> <!-- Top-Level Component Type in SceneGraph. Owns the display, unlike a task. Limited to one active scene at a time. --> 
+  <script type="text/brightscript" uri="pkg:/components/NightscoutSetup.brs" /> <!-- The BRS file is linked to this XML via this Script tag. -->
   <children>
-    <Rectangle id="bg" width="1920" height="1080" color="0x0F0F1EFF">
-
+    <Rectangle id="bg" width="1920" height="1080" color="0x0F0F1EFF"> <!-- Basis resolution for translation x-y specs. The manifest's ui_resolution tells the Roku to scale down when the TV is 720p. --> <!-- Full-screen dark-navy opaque rectangle for background color. All other elements are children of this rectangle, and so inherit its coordinate space. -->
+      <!-- Disclaimer overlay elements are at the bottom -->
       <Label text="NightscoutTV for Roku: Settings"
              font="font:LargeBoldSystemFont" color="0xFFFFFFFF"
-             translation="[80, 60]" />
+             translation="[80, 60]" /> <!-- Static Title text. -->
 
       <Rectangle id="focusBar" width="1760" height="60"
-                 color="0x2244AACC" translation="[80, 168]" />
+                 color="0x2244AACC" translation="[80, 168]" /> <!-- Focus bar, to show which row the user is interacting with. Moved by the BRS file. 80% Opacity. -->
 
       <!-- Row 0: URL -->
       <Label text="Nightscout URL"  color="0x8888AAFF" translation="[80, 148]" />
@@ -19,7 +19,7 @@
       <Label text="Access Token"   color="0x8888AAFF" translation="[80, 248]" />
       <Label id="tokenDisplay" text="(blank)" color="0xFFFFFFFF" translation="[340, 278]" />
 
-      <!-- Row 2: Units -->
+      <!-- Row 2: Units (mg/dL or mmol/L) --> <!-- SceneGraph has no native checkbox, so this makes one. BRS has bright-blue and X as checked, dark blue and empty as unchecked.  -->
       <Label text="Units" color="0x8888AAFF" translation="[80, 348]" />
       <Rectangle id="chkMgBox" width="32" height="32" color="0x2244AAFF" translation="[340, 354]">
         <Label id="chkMgMark" text="X" color="0xFFFFFFFF" translation="[7, 4]" />
@@ -30,42 +30,45 @@
       </Rectangle>
       <Label text="mmol/L" color="0xFFFFFFFF" translation="[544, 354]" />
 
-      <!-- Row 3: Default Display duration -->
+      <!-- Row 3: Default Display Duration (hours) --> <!-- GT and LT arrows are static text. BRS updates center value. -->
       <Label text="Default Display" color="0x8888AAFF" translation="[80, 448]" />
       <Label text="&lt;" color="0x888888FF" translation="[340, 458]" />
-      <Label id="hoursDisplay" text="3h" color="0xFFFFFFFF" translation="[370, 458]" />
+      <Label id="hoursDisplay" text="4h" color="0xFFFFFFFF" translation="[370, 458]" />
       <Label text="&gt;" color="0x888888FF" translation="[430, 458]" />
       <Label text="Left/Right to change" color="0x444466FF" translation="[470, 458]" />
 
-      <!-- Row 4: Bolus Display Threshold -->
+      <!-- Row 4: Bolus Display Threshold (Units) -->
       <Label text="Bolus Threshold" color="0x8888AAFF" translation="[80, 548]" />
       <Label text="&lt;" color="0x888888FF" translation="[340, 558]" />
       <Label id="bolusDisplay" text=">= 0.5 U" color="0xFFFFFFFF" translation="[370, 558]" />
       <Label text="&gt;" color="0x888888FF" translation="[510, 558]" />
       <Label text="Left/Right to change" color="0x444466FF" translation="[550, 558]" />
 
-      <!-- Row 5: Basal Render -->
+      <!-- Row 5: Basal Render (None, Default, or Icicle) -->
       <Label text="Render Basal" color="0x8888AAFF" translation="[80, 648]" />
       <Label text="&lt;" color="0x888888FF" translation="[340, 658]" />
       <Label id="basalDisplay" text="Icicle" color="0xFFFFFFFF" translation="[370, 658]" />
       <Label text="&gt;" color="0x888888FF" translation="[700, 658]" />
       <Label text="Left/Right to change" color="0x444466FF" translation="[750, 658]" />
 
-      <!-- Row 6: Save button -->
+      <!-- Row 6: Save button --> <!-- BRS handles OK keypress with Row 6 focus and calls saveSettings(). -->
       <Rectangle id="saveBtn" width="280" height="60"
                  color="0x226622FF" translation="[340, 738]">
         <Label text="Save" color="0xFFFFFFFF" translation="[40, 14]" />
       </Rectangle>
 
-      <Label id="setupStatus" text="" color="0xFF6655FF" translation="[80, 840]" />
+      <!-- Dynamic feedback text --> <!-- BRS writes status upon error or after save. -->
+      <Label id="setupStatus" text="" color="0xFF6655FF" translation="[80, 840]" /> 
 
+      <!-- Static text for button legend -->
       <Label text="Up/Down = move   OK = edit   Left/Right = change default hours   Back = cancel &amp; close"
              color="0x444466FF" translation="[80, 1020]" />
     </Rectangle>
 
-    <!-- Disclaimer overlay: shown for 8s on first open, then hidden -->
+    <!-- Disclaimer overlay: Shown for 8s on first open, then hidden. -->
+    <!-- Sits outside the bg Rectangle. So it renders on top of everything else in the scene. -->
     <Rectangle id="disclaimerOverlay" width="1920" height="1080"
-               color="0x000000FF" visible="true">
+               color="0x000000FF" visible="true"> <!-- Default initially visible, for the BRS to hide via disclaimerOverlay visible="false" after it appears for long enough. --> 
       <Poster id="disclaimerPoster" uri="pkg:/images/splash_hd.png"
               width="1920" height="1080" />
     </Rectangle>
