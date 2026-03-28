@@ -5,6 +5,12 @@
 ' This task is STATELESS. That is, every call creates a fresh task node, does its work, writes to output field, and exits. 
 ' That is, NO STATE PERSISTS BETWEEN CALLS. All state lives in the scene (NightscoutLive.brs) in m.* variables. 
 
+' All of these memory management APIs ARE used in source/main.brs:
+'   EnableLowGeneralMemoryEvent
+'   EnableMemoryWarningEvent
+'   GetMemoryLimitPercent
+'   GetChannelMemoryLimit
+'   GetChannelAvailableMemory
 
 sub init()
     m.top.functionName = "taskRun" ' m.top is the node itself. This tells Roku which function to call when the task's control field is set to RUN.
