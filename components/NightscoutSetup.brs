@@ -156,7 +156,7 @@ function onKeyEvent(key as String, press as Boolean) as Boolean
     '    return true
     'end if
     
-    ' If a KeyboardDialog is open, let it handle all key events. 
+    ' If a StandardKeyboardDialog is open, let it handle all key events. 
     if m.top.dialog <> invalid then return false
 
     ' Handle row navigation around-the-bend... 
@@ -273,7 +273,7 @@ end sub
 
 sub showUrlDialog()
     m.dialogPurpose = "url" ' Early assignment to ensure dialog knows format and/or where to send results. 
-    kbd = CreateObject("roSGNode", "KeyboardDialog") ' Creates a KeyboardDialog (built-in to Roku) named kbd. 
+    kbd = CreateObject("roSGNode", "StandardKeyboardDialog") ' Creates a StandardKeyboardDialog (built-in to Roku) named kbd. 
     kbd.title   = "Nightscout URL"
     kbd.message = "Include https:// -- no trailing slash needed"
     kbd.buttons = ["Save", "Cancel"]
@@ -290,7 +290,7 @@ end sub
 
 sub showTokenDialog()
     m.dialogPurpose = "token" ' Early assignment to ensure dialog knows format and/or where to send results. 
-    kbd = CreateObject("roSGNode", "KeyboardDialog") ' Creates a KeyboardDialog (built-in to Roku) named kbd. 
+    kbd = CreateObject("roSGNode", "StandardKeyboardDialog") ' Creates a StandardKeyboardDialog (built-in to Roku) named kbd. 
     kbd.title   = "Access Token"
     kbd.message = "Leave blank if no token is required."
     kbd.buttons = ["Save", "Cancel"]
