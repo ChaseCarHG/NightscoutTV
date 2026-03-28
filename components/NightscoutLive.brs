@@ -1,7 +1,7 @@
 ' NightscoutScene.brs
 ' Setup screen: Up/Down to move focus between rows, OK to activate.
-' Row 0 = URL (KeyboardDialog, pre-filled with "https://")
-' Row 1 = Token (KeyboardDialog)
+' Row 0 = URL (StandardKeyboardDialog, pre-filled with "https://")
+' Row 1 = Token (StandardKeyboardDialog)
 ' Row 2 = Units (OK toggles mg/dL <-> mmol/L checkboxes)
 ' Row 3 = Connect button
 
