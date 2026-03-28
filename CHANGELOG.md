@@ -1,5 +1,12 @@
 CHANGELOG
 
+SATURDAY 28 Mar 2026 - V0.8.00006-Alpha   
+  PUBLICATION  
+  • To meet Roku Store Requirements: 
+    - Added right-sized image for Disclaimer Splash Screen in 720p.   
+    - Clarified in all .brs files that low-memory warning and event detection is provided by main.brs.
+    - Made screensaver mode clear that it is NOT interactive, whereas some interactivity exists when launched in app mode (limited to change graph timespan, and manually request data refresh).
+
 SATURDAY 28 Mar 2026 - V0.8.00005-Alpha   
   PUBLICATION  
   • Resolved LOADS of Roku Store Errors & Warnings.   
