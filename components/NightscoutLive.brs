@@ -8,8 +8,11 @@
 ' Focus bar Y positions: 168, 268, 348, 438
 ' NUM_ROWS = 4  (used as literals below)
 
-sub init()
-    ' -- Live screen nodes only --
+sub init() ' Runs when scene is created. 
+    ' First, grab node references (for the live screen nodes only). 
+    ' Each walks the XML tree and returns a live reference to the named node, to store in the m.* variable.
+    ' Keeps the BRS from having to search the tree every time. 
+    ' Note that in Brightscript, m is a component-scoped associative array (ala "this"). m dies with the component. 
     m.bgValue     = m.top.findNode("bgValue")
     m.trendLabel  = m.top.findNode("trendLabel")
     m.deltaLabel  = m.top.findNode("deltaLabel")
@@ -25,6 +28,8 @@ sub init()
     m.bageLabel    = m.top.findNode("bageLabel")
     m.clockLabel   = m.top.findNode("clockLabel")
 
+    ' m.hourBtns below assocarray is a convenient lookup table. The key is the hour count as a STRING, and the value is a 2-element array of the rectangleNode and labelNode for it. 
+    ' This avoid seperate findNode() calls. 
     m.hourBtns = {
         "2":  [m.top.findNode("s2h"),  m.top.findNode("l2h")],
         "3":  [m.top.findNode("s3h"),  m.top.findNode("l3h")],
@@ -34,22 +39,23 @@ sub init()
         "24": [m.top.findNode("s24h"), m.top.findNode("l24h")]
     }
 
+    ' State Initialization: All m.* variables set to safe defaults. 
     m.nsUrl         = ""
     m.nsToken       = ""
     m.unitsMgdl     = true
-    m.graphHours    = 3
+    m.graphHours    = 4
     m.bgLow         = 80
     m.bgHigh        = 180
     m.nsTitle       = ""
     m.lastDebugInfo = ""
-    m.bolusMinU     = 0.5
+    m.bolusMinU     = 0.1
     m.basalRender   = "icicle"
     m.enabledPlugins  = ""
     m.pillData        = {}
     m.timeFormat      = 12
     m.utcOffMin       = 0
-    m.batteryPct      = -1
-    m.pillThresholds  = {cageWarn:72, cageUrgent:96, sageWarn:144, sageUrgent:164, iageWarn:44, iageUrgent:48, bageWarn:240, bageUrgent:360, bageWarnP:-1, bageUrgentP:-1}
+    m.batteryPct      = -1 ' Sentinel value, means Not Yet Fetched. 
+    m.pillThresholds  = {cageWarn:72, cageUrgent:96, sageWarn:144, sageUrgent:164, iageWarn:44, iageUrgent:48, bageWarn:240, bageUrgent:360, bageWarnP:-1, bageUrgentP:-1} ' Defaults for functionality before status.json gets downloaded and processed. 
     m.treatments    = []
     m.basals        = []
     m.basalSchedule  = []
@@ -57,7 +63,7 @@ sub init()
     m.lastEntries    = []
     m.lastResult     = invalid
 
-    ' Task node refs - initialized to invalid so cleanup guards work first run
+    ' Task node refs - initialized to invalid, so that cleanup guards will work first run. 
     m.fetchTask   = invalid
     m.statusTask  = invalid
     m.basalTask   = invalid
@@ -71,15 +77,16 @@ sub init()
     m.timer          = CreateObject("roSGNode", "Timer")
     m.timer.duration = 60
     m.timer.repeat   = true
-    m.timer.observeFieldScoped("fire", "onTimer")
+    m.timer.observeFieldScoped("fire", "onTimer") ' Calls onTimer() every duration. 
     m.timer.control  = "start"
 
+    ' Poll Timer is currently not used. Retained from earlier troubleshooting. 
     m.poll          = CreateObject("roSGNode", "Timer")
     m.poll.duration = 3
     m.poll.repeat   = true
     m.poll.observeFieldScoped("fire", "onPoll")
 
-    ' -- Load settings on startup --
+    ' Kicks off background task to read the registry, after which, everything awaits a call of onSettingsLoaded() (below). 
     m.loadTask = CreateObject("roSGNode", "NightscoutTask")
     m.loadTask.observeFieldScoped("settingsLoaded", "onSettingsLoaded")
     m.loadTask.action  = "load"
@@ -89,19 +96,21 @@ sub init()
 end sub
 
 sub onSettingsLoaded()
+    ' Once settings are loaded from the registry, this fires and gets real display work done. 
     s = m.loadTask.settingsLoaded
     if s = invalid then return
+    ' Store all settings into m.* variables. 
     m.nsUrl      = s.url
     m.nsToken    = s.token
     m.unitsMgdl  = s.unitsMgdl
     m.graphHours = s.graphHours
     if s.bolusMinU   <> invalid then m.bolusMinU   = val(s.bolusMinU.ToStr())
     if s.basalRender <> invalid then m.basalRender = s.basalRender.ToStr()
-    if left(m.nsUrl, 7) = "http://"
+    if left(m.nsUrl, 7) = "http://" ' Again ensure secure connection. 
         m.nsUrl = "https://" + mid(m.nsUrl, 8)
     end if
-    refreshHourBtns()
-    if m.nsUrl <> ""
+    refreshHourBtns() ' Highlight correct hour button for graph timescale. 
+    if m.nsUrl <> "" ' Fire all seven fetch events simultaneously, each having the own task. Oh yeah, and, starts the clock! 
         doFetch()
         doFetchTreatments()
         doFetchBasals()
@@ -111,7 +120,7 @@ sub onSettingsLoaded()
         doFetchDeviceStatus()
         startClock()
     else
-        m.statusMsg.text = "Not configured. Go to: Settings > Theme > Screensaver > NightscoutTV for Roku > Settings"
+        m.statusMsg.text = "Not configured. Go to: Settings > Theme > Screensaver > NightscoutTV for Roku > Settings" 'In case no URL specified. 
     end if
     m.top.setFocus(true)
 end sub
@@ -122,20 +131,21 @@ end sub
 
 
 
-
+' No Keyboard Dialogs on the live screen. That's reserved for Setup. 
 
 
 ' -----------------------------------------------------------------
 ' KEY EVENTS
 ' -----------------------------------------------------------------
 function onKeyEvent(key as String, press as Boolean) as Boolean
-    if not press then return false
+    ' Simple here, three keys. 
+    if not press then return false ' Ignore key release events. We only want to look at key press events. 
     if key = "back"
-        return false
-    else if key = "select" or key = "OK" or key = "play"
+        return false ' Let the Roku OS handle the BACK keypress. 
+    else if key = "select" or key = "OK" or key = "play" ' Triggers a manual doFetch() immediately. 
         doFetch()
         return true
-    else if key = "left" or key = "right"
+    else if key = "left" or key = "right" ' Left or Right will cycle the graph timespan, horizontal axis, and highlighted button. Requires new fetches. 
         cycleHours(key)
         return true
     end if
@@ -148,6 +158,7 @@ end function
 ' FOCUS BAR
 ' -----------------------------------------------------------------
 
+' No Focus Bar on the live screen. That's reserved for Setup. 
 
 ' -----------------------------------------------------------------
 ' DISPLAY REFRESH
@@ -157,9 +168,11 @@ end function
 
 
 sub refreshHourBtns()
+    ' Highlight correct hour button for graph timescale. 
+    ' Walks all six hour buttons and colors the active one bright blue and white, and the others dim. 
     opts = ["2", "3", "4", "6", "12", "24"]
     for each h in opts
-        pair = m.hourBtns[h]
+        pair = m.hourBtns[h] ' Retrieves the rect, label pair for each hour string. 
         if h.ToInt() = m.graphHours
             pair[0].color = "0x2244CCFF"
             pair[1].color = "0xFFFFFFFF"
@@ -175,12 +188,15 @@ end sub
 ' -----------------------------------------------------------------
 
 
-' showSetup removed - settings handled via RunScreenSaverSettings
+' showSetup removed - Settings now handled only on first run, and via RunScreenSaverSettings.
 
 
 sub doFetchStatus()
-    if m.statusTask <> invalid then m.statusTask.control = "STOP" : m.statusTask = invalid
-    t = CreateObject("roSGNode", "NightscoutTask")
+    ' Download from Nightscout server. 
+    ' Fetches /api/v1/status.json for nsCustomTitle, pillThresholds, and timeFormat. 
+    ' As the task writes each, each will fire a seperate callback. 
+    if m.statusTask <> invalid then m.statusTask.control = "STOP" : m.statusTask = invalid ' Stop any old task if running to prevent task accumulation and their memory leaks. 
+    t = CreateObject("roSGNode", "NightscoutTask") ' Create a fresh task, set inputs, and observe output. 
     m.statusTask = t
     t.observeFieldScoped("nsCustomTitle",  "onStatus")
     t.observeFieldScoped("pillThresholds", "onPillThresholds")
@@ -192,8 +208,10 @@ sub doFetchStatus()
 end sub
 
 sub onStatus()
+    ' Read result from task, store it in m.*, and trigger redraw. 
+    ' Used to read enabledPlugins, makes it all lowercase, stores it, then calls renderPills()
     ct = m.statusTask.nsCustomTitle
-    if ct <> invalid and ct <> "" and ct <> "__unset__"
+    if ct <> invalid and ct <> "" and ct <> "__unset__" ' The weird unset default here is the sentinel, to ensure alwaysNotify fires on the first call. 
         m.nsTitle = ct
         m.customTitle.text = ct
     end if
@@ -203,12 +221,14 @@ sub onStatus()
 end sub
 
 sub doFetchBasals()
-    if m.basalRender = "none"
+    ' Download from Nightscout server. 
+    ' Fetches TEMP BASAL treatments and calls onBasals() upon completion, which will in turn call rebuildBasals(). 
+    if m.basalRender = "none" ' Exits immediately if no network call is needed because user choose not to display basal data. 
         m.basals = []
         return
     end if
-    if m.basalTask <> invalid then m.basalTask.control = "STOP" : m.basalTask = invalid
-    t = CreateObject("roSGNode", "NightscoutTask")
+    if m.basalTask <> invalid then m.basalTask.control = "STOP" : m.basalTask = invalid ' Stop any old task if running to prevent task accumulation and their memory leaks. 
+    t = CreateObject("roSGNode", "NightscoutTask") ' Create a fresh task, set inputs, and observe output. 
     m.basalTask = t
     t.observeFieldScoped("basals", "onBasals")
     t.nsUrl      = m.nsUrl
@@ -219,14 +239,26 @@ sub doFetchBasals()
 end sub
 
 sub onBasals()
+    ' Read result from task, store it in m.*, and call rebuildBasals() to trigger recalc and redraw. 
+    ' This part is for TEMP BASAL treatments. 
     csv = m.basalTask.basals
     if csv = invalid then return
     m.basals = parseBasalsCSV(csv)
     rebuildBasals()
 end sub
 
-' Combine temp basals + profile gap-fills into m.combinedBasals, then redraw
+																			
 sub rebuildBasals()
+    ' Combine temp basals + profile basals as gap-filler. Combined into m.combinedBasals. Then causes redraw. 
+    ' The most complex logic in the file. Results in a single seamless timeline for the graph. 
+    ' ALWAYS works with 24-hour window regardless of what graphHours is, to ensure the vertical axis scaling stays consistent when the timespan is changed. 
+    ' Outline: 
+    '    1. Filter temp basals to those overlapping 24-hour window, and for each mark isTemp as true. 
+    '    2. Use cursor to walk timeline from startSec to nowSec. 
+    '    3. Upon any gap before next Temp Basal, lookup scheduled Profile Basal rate using scheduledRateAt() function and fill with Profile Basal data, marking isTemp false. 
+    '    4. Handle schedule boundaries mid-gap, by using an inner while loop to find the next schedule boundary within a gap at which we can cleanly record any Basal changes. 
+    '    5. Snap adjacent segments so each one ends exactly where the next begins, to provide clean rendering. 
+    ' Off to the races. 
     if m.basalRender = "none" then return
 
     dtNow    = CreateObject("roDateTime")
@@ -363,12 +395,13 @@ end function
 
 
 sub doFetchTreatments()
-    if m.bolusMinU <= 0.0
-        m.treatments = []
+    ' Download from Nightscout server. 
+    if m.bolusMinU <= 0.0 ' Unexpected setting or OFF mode, so... 
+        m.treatments = [] ' ...nothing to return. 
         return
     end if
-    if m.treatTask <> invalid then m.treatTask.control = "STOP" : m.treatTask = invalid
-    t = CreateObject("roSGNode", "NightscoutTask")
+    if m.treatTask <> invalid then m.treatTask.control = "STOP" : m.treatTask = invalid ' Stop any old task if running to prevent task accumulation and their memory leaks. 
+    t = CreateObject("roSGNode", "NightscoutTask") ' Create a fresh task, set inputs, and observe output. 
     m.treatTask = t
     t.observeFieldScoped("treatments", "onTreatments")
     t.nsUrl      = m.nsUrl
@@ -380,10 +413,11 @@ sub doFetchTreatments()
 end sub
 
 sub onTreatments()
+    ' Read result from task, store it in m.*, and trigger redraw. 
     csv = m.treatTask.treatments
     if csv = invalid then return
     m.treatments = parseTreatmentsCSV(csv)
-    ' Redraw graph with boluses if we already have entries
+    ' Redraw graph with boluses if we already have entries. That is, boluses can arrive after initial graph draw. 
     if m.lastEntries <> invalid and m.lastEntries.Count() > 0
         drawGraph(m.lastEntries, m.graphHours, m.unitsMgdl)
     end if
@@ -411,9 +445,11 @@ function parseTreatmentsCSV(csv as String) as Object
 end function
 
 sub doFetchDeviceStatus()
-    if not pluginEnabled("bage") then return
-    if m.deviceTask <> invalid then m.deviceTask.control = "STOP" : m.deviceTask = invalid
-    t = CreateObject("roSGNode", "NightscoutTask")
+    ' Download from Nightscout server. 
+    ' Stores battery percentage, and calls onBatteryPct to render pills. 
+    if not pluginEnabled("bage") then return ' Skip if BAGE isn't enabled in Nightscout server. 
+    if m.deviceTask <> invalid then m.deviceTask.control = "STOP" : m.deviceTask = invalid ' Stop any old task if running to prevent task accumulation and their memory leaks. 
+    t = CreateObject("roSGNode", "NightscoutTask") ' Create a fresh task, set inputs, and observe output. 
     m.deviceTask = t
     t.observeFieldScoped("batteryPct", "onBatteryPct")
     t.nsUrl   = m.nsUrl
@@ -423,17 +459,21 @@ sub doFetchDeviceStatus()
 end sub
 
 sub onBatteryPct()
+    ' Read result from task, store it in m.*, and trigger redraw. 
+    ' Renders battery percentage pills. 
     m.batteryPct = m.deviceTask.batteryPct
     renderPills()
 end sub
 
 sub onTimeFormat()
+    ' Read result from task, store it in m.*, and trigger redraw. 
     tf = m.statusTask.timeFormat
     if tf <> invalid then m.timeFormat = tf
     updateClock()
 end sub
 
 sub onPillThresholds()
+    ' Read result from task, store it in m.*, and trigger redraw. 
     csv = m.statusTask.pillThresholds
     if csv = invalid or csv = "" then return
     parts = csv.split(",")
@@ -454,8 +494,11 @@ sub onPillThresholds()
 end sub
 
 sub doFetchPills()
-    if m.pillTask <> invalid then m.pillTask.control = "STOP" : m.pillTask = invalid
-    t = CreateObject("roSGNode", "NightscoutTask")
+    ' Download from Nightscout server. 
+    ' After parsing the PSV-CSV into the pills assocarray, resolves SAGE by taking the more recent of SAGE (Sensor Change) and SAGESTART (Sensor Start). 
+    ' Then calls onPills() to call renderPills(). 
+    if m.pillTask <> invalid then m.pillTask.control = "STOP" : m.pillTask = invalid ' Stop any old task if running to prevent task accumulation and their memory leaks. 
+    t = CreateObject("roSGNode", "NightscoutTask") ' Create a fresh task, set inputs, and observe output. 
     m.pillTask = t
     t.observeFieldScoped("pills", "onPills")
     t.nsUrl   = m.nsUrl
@@ -465,6 +508,7 @@ sub doFetchPills()
 end sub
 
 sub onPills()
+    ' Read result from task, store it in m.*, and trigger redraw. 
     csv = m.pillTask.pills
     if csv = invalid then return
 
@@ -477,7 +521,7 @@ sub onPills()
         end if
     end for
 
-    ' SAGE = more recent of Sensor Change or Sensor Start
+    ' SAGE = More recent of SAGE (Sensor Change) or SAGESTART (Sensor Start). 
     sageSec = 0
     if pills["sage"] <> invalid      then sageSec = pills["sage"]
     if pills["sagestart"] <> invalid
@@ -582,7 +626,7 @@ end sub
 
 sub onClockTick()
     updateClock()
-    updateAgeText(m.lastResult)
+    updateAgeText(m.lastResult) 'To update "Last: HH:mm" and "(N minutes ago)" labels. 
     ' Now switch to a steady 60s repeating timer
     m.clockTimer.duration = 60
     m.clockTimer.repeat   = true
@@ -626,8 +670,12 @@ function pillColor(epochSec as Integer, nowSec as Integer, warnHrs as Integer, u
 end function
 
 sub doFetchProfile()
-    if m.profileTask <> invalid then m.profileTask.control = "STOP" : m.profileTask = invalid
-    t = CreateObject("roSGNode", "NightscoutTask")
+    ' Download from Nightscout server. 
+    ' Observes two output fields: 
+    '    onProfile stores bgLow and bgHigh for graph coloring. 
+    '    onBasalSchedule parses basal schedule and calls rebuildBasals(), used to fill in any gaps of Temp Basal data.
+    if m.profileTask <> invalid then m.profileTask.control = "STOP" : m.profileTask = invalid ' Stop any old task if running to prevent task accumulation and their memory leaks. 
+    t = CreateObject("roSGNode", "NightscoutTask") ' Create a fresh task, set inputs, and observe output. 
     m.profileTask = t
     t.observeFieldScoped("profile",       "onProfile")
     t.observeFieldScoped("basalSchedule", "onBasalSchedule")
@@ -638,6 +686,7 @@ sub doFetchProfile()
 end sub
 
 sub onProfile()
+    ' Read result from task, store it in m.*, and trigger redraw. 
     p = m.profileTask.profile
     if p = invalid then return
     if p.bgLow  > 0 then m.bgLow  = p.bgLow
@@ -645,6 +694,7 @@ sub onProfile()
 end sub
 
 sub onBasalSchedule()
+    ' Read result from task, store it in m.*, and trigger redraw. 
     csv = m.profileTask.basalSchedule
     if csv = invalid then return
     m.basalSchedule = parseBasalScheduleCSV(csv)
@@ -698,11 +748,13 @@ end function
 ' FETCH
 ' -----------------------------------------------------------------
 sub doFetch()
+    ' Main CGM Data Fetch. Calls onResult() when completed. 
+    ' Sets "Fetching..." status message, kills any in-progress fetch task, and creates a fresh one. 
     m.statusMsg.text    = "Fetching..."
     m.debugMsg.text     = "URL: " + m.nsUrl
     m.lastDebugInfo     = ""
-    if m.fetchTask <> invalid then m.fetchTask.control = "STOP" : m.fetchTask = invalid
-    t = CreateObject("roSGNode", "NightscoutTask")
+    if m.fetchTask <> invalid then m.fetchTask.control = "STOP" : m.fetchTask = invalid ' Stop any old task if running to prevent task accumulation and their memory leaks. 
+    t = CreateObject("roSGNode", "NightscoutTask") ' Create a fresh task, set inputs, and observe output. 
     t.observeFieldScoped("result", "onResult")
     t.action     = "fetch"
     t.nsUrl      = m.nsUrl
@@ -714,10 +766,13 @@ sub doFetch()
 end sub
 
 sub onTimer()
+    ' Exists purely to call doFetch per the 60-second repeating timer. 
     doFetch()
 end sub
 
 sub updateAgeText(r as Object)
+    ' Updates "Last: HH:mm" and "(N minutes ago)" labels. 
+    ' Uses local time for both, by adding m.utcOffMin * 60, which works because it is the age difference is exactly what the clock shows, using truncration to the minute before subtraction. 
     if r = invalid then return
     dt = CreateObject("roDateTime")
     dt.Mark()
@@ -737,11 +792,12 @@ sub updateAgeText(r as Object)
     m.timeLabelAge.text  = agoStr
 end sub
 
-' Poll fallback - kept as no-op; real result delivery via observeFieldScoped
+' Poll timer fallback - used for prior troubleshooting, currently does nothing. 
 sub onPoll()
 end sub
 
 sub onResult()
+    ' On result of main CGM data fetch. Called by doFetch(). Reads from m.fetchTask and passes it back to processResult(). 
     if m.fetchTask = invalid then return
     r = m.fetchTask.result
     if r = invalid then return
@@ -749,6 +805,9 @@ sub onResult()
 end sub
 
 sub processResult(r as Object)
+    ' Main results event handler. 
+    
+    'First, handle any errors. 
     if r = invalid
         m.statusMsg.text = "Error: no response"
         m.debugMsg.text  = "result=invalid"
@@ -761,7 +820,7 @@ sub processResult(r as Object)
     end if
     m.statusMsg.text = ""
 
-    ' BG value and color
+    ' Sensor Glucose value and color (the big display numbers)
     m.bgValue.text     = r.dispBg
     liveColor          = gBgColor(r.rawBg, m.bgLow, m.bgHigh)
     m.bgValue.color    = liveColor
@@ -769,6 +828,8 @@ sub processResult(r as Object)
     m.trendLabel.color = liveColor
 
     ' Delta with units
+    ' If mg/dL then simple string. 
+    ' If mmol/L then converts, then formats as one decimal place using integer tenth math (to avoid float formatting). 
     if m.unitsMgdl
         m.deltaLabel.text = r.dispDelta + " mg/dL"
     else
@@ -785,7 +846,7 @@ sub processResult(r as Object)
 
     ' Timestamp with age - updated on refresh and on each clock tick
     m.lastResult = r
-    updateAgeText(r)
+    updateAgeText(r) ' To update "Last: HH:mm" and "(N minutes ago)" labels.
 
     ' Status line, like this: "OK.  102 mg/dL.  Values Loaded: 42."
     unitStr = "mg/dL"
@@ -809,6 +870,8 @@ end sub
 ' HOURS
 ' -----------------------------------------------------------------
 sub cycleHours(dir as String)
+    ' Cycles options for default display timespan (horizontal axis). 
+    ' Same cycling patten as in NighscoutSetup.brs. Changing the time window changes data needed (except basals always load 24 hours). 
     opts = [2, 3, 4, 6, 12, 24]
     idx  = 0
     for i = 0 to opts.Count() - 1
@@ -832,6 +895,8 @@ end sub
 ' SAVE SETTINGS (via Task)
 ' -----------------------------------------------------------------
 sub saveSettings()
+    ' Only saves URL, Access Token, Units Selection, and GraphHours. 
+    ' Does NOT save bolusMinU or basalRender, which are set immediately on change in the Setup Screen. 
     if m.saveTask <> invalid then m.saveTask.control = "STOP" : m.saveTask = invalid
     t = CreateObject("roSGNode", "NightscoutTask")
     t.settingsToSave = {
@@ -848,6 +913,7 @@ end sub
 
 ' Parse 'sec,sgv|sec,sgv|...' CSV string back into array of {dateSec, sgv}
 function parseEntriesCSV(csv as String) as Object
+    ' Reverses CSV/PSV encoding from doFetch, to extract dateSec and sgv values. 
     entries = []
     if csv = "" then return entries
     rows = csv.split("|")
@@ -870,11 +936,12 @@ end function
 ' Thresholds: m.bgLow, m.bgHigh (mg/dL, from profile or defaults)
 ' -----------------------------------------------------------------
 sub drawGraph(entries as Object, hours as Integer, mgdl as Boolean)
+    ' Rendering engine. On each call, rebuilds graph completely.  
     grp = m.graphGroup
     if grp = invalid then return
 
     while grp.getChildCount() > 0
-        grp.removeChildIndex(0)
+        grp.removeChildIndex(0) ' Empty the graph completely, to avoid any stale data or artifacts. 
     end while
 
     if entries = invalid or entries.Count() = 0 then return
@@ -888,7 +955,18 @@ sub drawGraph(entries as Object, hours as Integer, mgdl as Boolean)
     PAB  = 28
     GW   = GRPW - PAL - PAR
     GH   = GRPH - PAT - PAB
-
+    
+    ' Drawing order matters. Items drawn first appear in back. Newer items appear in front. 
+    '    1. Background rectangle. 
+    '    2. Colored bands (m.bgLow, m.bgHigh). 
+    '    3. Basal bars (behind all else). 
+    '    4. Grid lines. 
+    '    5. Vertical Axis Labels
+    '    6. Horizontal Axis Labels
+    '    7. Border Lines. 
+    '    8. Glucose Data. 
+    '    9. Bolus Markers (on top of even glucose data). 
+    
     ' Time range
     dt = CreateObject("roDateTime")
     dt.Mark()
@@ -904,6 +982,9 @@ sub drawGraph(entries as Object, hours as Integer, mgdl as Boolean)
 
     ' Log scale: map mg/dL to Y using natural log
     ' Range: 40..400 mg/dL
+    ' Copies Nightscout Scale Logarithmic (but not LogarithmicDynamic). 
+    ' Leverages BrightScript Log() (natural log) function. 
+    ' Inversion since higher glucoses nead to appear towards top of chart which has LOWER Y coordinate values. 
     YMIN_MG = 40
     YMAX_MG = 400
     logMin  = logY(YMIN_MG)
@@ -923,11 +1004,14 @@ sub drawGraph(entries as Object, hours as Integer, mgdl as Boolean)
     mkRect(grp, PAL, PAT, GW, yHigh - PAT,     "0xFF880018")
 
     ' --- Basal bars (drawn first, below everything else) ---
+    ' Uses m.combinedBasals (the merged temp+profile timeline) with isTemp flag to choose color.
+    ' This allows user to distinguish betwen brighter Temp Basals and dimmer Profile Basals. 
+    ' Important since usually Temp Basal data inputs lag.
     basalSrc = m.combinedBasals
     if basalSrc = invalid or basalSrc.Count() = 0 then basalSrc = m.basals
     if basalSrc <> invalid and m.basalRender <> "none" and basalSrc.Count() > 0
-        ' Compute maxRate from ALL fetched data (full combinedBasals),
-        ' not just the visible window -- prevents rescaling on timespan change
+        ' Compute maxRate from ALL fetched data (full combinedBasals), 
+        ' and not just the visible window, to prevent rescaling on timespan change. 
         maxRate = 0
         allSrc = m.combinedBasals
         if allSrc = invalid or allSrc.Count() = 0 then allSrc = m.basals
@@ -937,7 +1021,7 @@ sub drawGraph(entries as Object, hours as Integer, mgdl as Boolean)
             end for
         end if
         if maxRate < 1 then maxRate = 10
-        basalH = int(GH * 0.25)
+        basalH = int(GH * 0.25) ' Basal display is set so that max over 24 hours is set to exactly 25 percent of graph height. 
         for each b in basalSrc
             bStart = b.startSec
             bEnd   = bStart + b.durationSec
@@ -1030,13 +1114,16 @@ sub drawGraph(entries as Object, hours as Integer, mgdl as Boolean)
     end if
 end sub
 
-' Draw a bolus marker: white top half, blue bottom half, text above/below
+																		 
 sub drawBolus(grp as Object, cx as Integer, cy as Integer, insulinTenths as Integer, carbs as Integer)
+    ' Draw a bolus marker: white top half, blue bottom half, text above/below. 
+    ' BrightScript has no easy way to draw circles. Instead, we draw squares, made of two rectangles. 
+    ' Todo: Dynamic sizing of bolus markers. What does Nighscout do?
     R = 10  ' radius (half-width of the pill)
     ' White top half
-    mkRect(grp, cx - R, cy - R*2, R*2, R, "0xFFFFFFFF")
+    mkRect(grp, cx - R,     cy - R*2, R*2, R,    "0xFFFFFFFF")
     ' Blue bottom half
-    mkRect(grp, cx - R, cy - R,   R*2, R, "0x4488FFFF")
+    mkRect(grp, cx - R,     cy - R  , R*2, R,    "0x4488FFFF")
     ' Thin border outline
     mkRect(grp, cx - R,     cy - R*2, R*2, 1,    "0x000000AA")  ' top
     mkRect(grp, cx - R,     cy,       R*2, 1,    "0x000000AA")  ' bottom
@@ -1044,7 +1131,7 @@ sub drawBolus(grp as Object, cx as Integer, cy as Integer, insulinTenths as Inte
     mkRect(grp, cx + R - 1, cy - R*2, 1,   R*2,  "0x000000AA")  ' right
     ' Insulin text below
     iWhole  = insulinTenths \ 10
-    iFrac   = insulinTenths mod 10
+    iFrac   = insulinTenths mod 10 'Reconstructs decimal representation without using floating point formatting. 
     iStr    = iWhole.ToStr() + "." + iFrac.ToStr() + "U"
     mkLabel(grp, cx - 16, cy + 2, iStr, "0x88CCFFFF")
     ' Carbs text above (if present)
@@ -1053,8 +1140,9 @@ sub drawBolus(grp as Object, cx as Integer, cy as Integer, insulinTenths as Inte
     end if
 end sub
 
-' Find the SGV value of the entry closest in time to targetSec
+															  
 function nearestSgv(entries as Object, targetSec as Integer) as Integer
+    ' Find the SGV value of the entry closest in time to targetSec. 
     best    = 0
     bestDiff = 99999
     for each e in entries
@@ -1068,16 +1156,18 @@ function nearestSgv(entries as Object, targetSec as Integer) as Integer
     return best
 end function
 
-' Natural log approximation (BrightScript has no math library)
-' ln(x) via series or table -- use lookup table for our fixed values
+															  
+																	
 function logY(mg as Integer) as Float
-    ' Use ln via identity: ln(x) = ln(a) + (x-a)/a - (x-a)^2/(2a^2) ...
-    ' Simpler: use Log() -- BrightScript DOES have Log() as natural log
+    ' Use Log() -- BrightScript DOES have Log() as natural log
+    ' ln(x) via series or table -- use lookup table for our fixed values. 
+    ' In case old Roku OS lacks log() function, modify this. 
     if mg < 1 then mg = 1
     return Log(mg)
 end function
 
 function logPx(mg as Integer, logMin as Float, logSpan as Float, padT as Integer, gH as Integer) as Integer
+    ' Maps a glucose value to a pixel Y coordinate using the log scale. 
     c = mg
     if c < 1 then c = 1
     frac = (Log(c) - logMin) / logSpan
@@ -1087,6 +1177,9 @@ end function
 
 
 function gYPx(mg as Integer, yMin as Integer, yMax as Integer, padT as Integer, gH as Integer) as Integer
+    ' Maps a glucose value to a pixel Y coordinate using linear scale. 
+    ' Todo: Implement, as an option akin to Nightscout scale options (Linear or Logarithmic). 
+    ' Currently, this is not used. 
     c = mg
     if c < yMin then c = yMin
     if c > yMax then c = yMax
@@ -1094,22 +1187,25 @@ function gYPx(mg as Integer, yMin as Integer, yMax as Integer, padT as Integer, 
 end function
 
 function gBgColor(mg as Integer, bgLow as Integer, bgHigh as Integer) as String
+    ' Five-tier color system for urgent-low red, low orange, in-range green, high amber, and urgent-high red. 
     urgLow  = bgLow - 20 : if urgLow < 40 then urgLow = 40
     urgHigh = bgHigh + 60
-    if mg <= urgLow  then return "0xFF2222FF"
-    if mg < bgLow    then return "0xFF6600FF"
-    if mg >= urgHigh then return "0xFF2222FF"
-    if mg > bgHigh   then return "0xFFAA00FF"
-    return "0x44FF88FF"
+    if mg <= urgLow  then return "0xFF2222FF" 'RED
+    if mg < bgLow    then return "0xFF6600FF" 'ORANGE
+    if mg >= urgHigh then return "0xFF2222FF" 'RED
+    if mg > bgHigh   then return "0xFFAA00FF" 'AMBER
+                          return "0x44FF88FF" 'GREEN
 end function
 
 function fmtMg(mg as Integer, mgdl as Boolean) as String
+    ' Formats a glucose value in the selected units. 
     if mgdl then return mg.ToStr()
     tenths = int(mg * 0.0555 * 10.0 + 0.5)
     return (tenths \ 10).ToStr() + "." + (tenths mod 10).ToStr()
 end function
 
 function gFmtHHMM(sec as Integer) as String
+    ' Formats as epoch seconds as hh:MM in local time, and applying m.utcOffMin. 
     dt = CreateObject("roDateTime")
     dt.FromSeconds(sec + m.utcOffMin * 60)
     h  = dt.GetHours()
@@ -1120,6 +1216,7 @@ function gFmtHHMM(sec as Integer) as String
 end function
 
 sub mkRect(grp as Object, x as Integer, y as Integer, w as Integer, h as Integer, col as String)
+    ' Used throughout drawGraph. 
     r = grp.createChild("Rectangle")
     r.translation = [x, y]
     r.width  = w
@@ -1128,6 +1225,7 @@ sub mkRect(grp as Object, x as Integer, y as Integer, w as Integer, h as Integer
 end sub
 
 sub mkLabel(grp as Object, x as Integer, y as Integer, txt as String, col as String)
+    ' Used throughout drawGraph. Always uses SmallestSystemFont since the graph needs compact text to fit everything. 
     lbl = grp.createChild("Label")
     lbl.translation = [x, y]
     lbl.text  = txt
