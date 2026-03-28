@@ -1,14 +1,12 @@
 title=NightscoutTV
-subtitle=CGM Live Display
 major_version=0
 minor_version=8
 build_version=00004
 mm_icon_focus_hd=pkg:/images/icon_focus_hd.png
-mm_icon_side_hd=pkg:/images/icon_side_hd.png
 splash_screen_fhd=pkg:/images/splash_hd.png
 splash_min_time=0
 ui_resolutions=fhd
-screensaver_title=NightscoutTV for Roku
+screensaver_title=NightscoutTV
 screensaver_private=0
 
 # IMPORTANT
