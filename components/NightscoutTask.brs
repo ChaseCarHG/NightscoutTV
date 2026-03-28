@@ -1,38 +1,48 @@
-' NightscoutTask.brs - stripped to bare minimum to diagnose task thread issue
+' NightscoutTask.brs - For troubleshooting task threads
+' This background thread is called upon by NightscoutSetup, and extensively by NightscoutLive
+' The render thread cannot support HTTP or similar tasks without freezing the GUI. 
+' So, this background thread handles all network calls, registry reads and writes, etc. 
+' This task is STATELESS. That is, every call creates a fresh task node, does its work, writes to output field, and exits. 
+' That is, NO STATE PERSISTS BETWEEN CALLS. All state lives in the scene (NightscoutLive.brs) in m.* variables. 
+
 
 sub init()
-    m.top.functionName = "taskRun"
+    m.top.functionName = "taskRun" ' m.top is the node itself. This tells Roku which function to call when the task's control field is set to RUN.
 end sub
 
-sub taskRun()
-
-    if m.top.action = "fetch"
+sub taskRun() ' Called upon by the init function above. 
+    ' Dispatches events. When the scene does t.action = "fetch" : t.control = "RUN", Roku calls taskRun() on the background thread.
+    ' A big switch statement to choose the right subroutine based on m.top.action (the node's queued action).
+    if m.top.action = "fetch" ' Get CGM Entries. 
         doFetch()
-    else if m.top.action = "treatments"
+    else if m.top.action = "treatments" ' Get bolus treatments. 
         doFetchTreatments()
-    else if m.top.action = "basals"
+    else if m.top.action = "basals" ' Get temp basal treatments. 
         doFetchBasals()
-    else if m.top.action = "profile"
+    else if m.top.action = "profile" ' Get profile basal data, and glucose threshold values for graph bands and coloring datapoints. 
         doFetchProfile()
-    else if m.top.action = "status"
+    else if m.top.action = "status" ' Get custom title, enabled plugins, and pill thresholds for IAGE CAGE SAGE and-or BAGE. 
         doFetchStatus()
-    else if m.top.action = "pills"
+    else if m.top.action = "pills" ' Gets IAGE CAGE SAGE and BAGE (pill) ages or percent-ages (percentages). 
         doFetchPills()
-    else if m.top.action = "devicestatus"
+    else if m.top.action = "devicestatus" ' Get pump battery percentage. 
         doFetchDeviceStatus()
-    else if m.top.action = "save"
+    else if m.top.action = "save" ' Write settings to the registry. 
         doSaveSettings()
     else
-        doLoadSettings()
+        doLoadSettings() ' Read settings from the registry. 
     end if
 
 end sub
 
-sub doLoadSettings()
+sub doLoadSettings() ' Loads settings from Roku's persistent registry storage system, scoped to the Roku Channel ID. 
+    ' Persistance here means it survives app restarts and Roku reboots. 
+    ' Reads all saved settings and packages them into a single assocarray (settingsLoaded) that is later read in onSettingsLoaded(). 
+    ' In absence of a stored value, will apply default values.
     url   = regRead("url")
     token = regRead("token")
     units = regRead("units")
-    hours = regReadInt("graphHours", 3)
+    hours = regReadInt("graphHours", 4)
 
     if left(url, 7) = "http://"
         url = "https://" + mid(url, 8)
@@ -54,7 +64,8 @@ sub doLoadSettings()
     }
 end sub
 
-sub doSaveSettings()
+sub doSaveSettings() ' Writes all settings to the persistent Roku registry, which survives app restarts and Roku reboots. 
+    ' Entries are scoped to the Channel ID. 
     s = m.top.settingsToSave
     if s = invalid then return
     regWrite("url",   s.url)
@@ -69,8 +80,9 @@ sub doSaveSettings()
     if s.basalRender  <> invalid then regWrite("basalRender",  s.basalRender.ToStr())
 end sub
 
-sub doFetch()
-
+sub doFetch() ' Fetches CGM data from Nightscout Server's /api/v1/entries.json
+    ' Count calc is graphHours * 12 + 6, as Nightscout stores a value every 5 minutes, and so there are 12 per hour. 
+    ' The 6 (arbitrary) extra serves as a buffer, for off the left edge of the graph, in case of data gaps, except the api returns in reverse-chronological order anyway. 
     result = {
         rawBg:      0,
         dispBg:     "---",
@@ -105,7 +117,7 @@ sub doFetch()
     apiUrl = baseUrl + "/api/v1/entries.json?count=" + count.ToStr()
     if token <> "" then apiUrl = apiUrl + "&token=" + token
 
-
+    ' First example of our typical HTTP pattern...
     port = CreateObject("roMessagePort")
     http = CreateObject("roUrlTransfer")
     http.SetUrl(apiUrl)
@@ -114,8 +126,8 @@ sub doFetch()
     http.InitClientCertificates()
     http.SetMessagePort(port)
 
-    if not http.AsyncGetToString()
-        result.error = "AsyncGetToString failed"
+    if not http.AsyncGetToString() ' Fire off our HTTP request, non-blocking. 
+        result.error = "AsyncGetToString failed" ' Block THIS thread only, up to 15 seconds, to await response. Avoids blocking the render thread. 
         m.top.result = result
         return
     end if
@@ -158,16 +170,18 @@ sub doFetch()
     firstDir  = "Flat"
     n = 0
 
+    ' Entry loop. Walks JSON array, extracts SGV (Sensor Glucose Value, in mg/dL) and date (epoch milliseconds, converted within from ms to s). 
     for each e in data
         sgvVal = e["sgv"]
-        if sgvVal <> invalid
-            sgv = int(sgvVal)
+        if sgvVal <> invalid ' Error check
+            sgv = int(sgvVal) ' Ensure integer
             if sgv > 0
-                dateVal = e["date"]
+                dateVal = e["date"] ' Returns epoch milliseconds
                 dateSec = 0
                 if dateVal <> invalid
                     ds = dateVal.ToStr()
                     dl = len(ds)
+                    ' The date conversion strips the last 3 digits, to convert from ms to s. Because metric. 
                     if dl > 3 then dateSec = left(ds, dl - 3).ToInt()
                 end if
                 if dateSec > 0
@@ -179,6 +193,7 @@ sub doFetch()
                     else if n = 1
                         secondSgv = sgv
                     end if
+                    ' Build entryStr as a pipe-delimited list, to prep for passing data to the scene
                     if entryStr <> "" then entryStr = entryStr + "|"
                     entryStr = entryStr + dateSec.ToStr() + "," + sgv.ToStr()
                     n = n + 1
@@ -197,7 +212,8 @@ sub doFetch()
     delta = 0
     if secondSgv > 0 then delta = firstSgv - secondSgv
 
-    ' Read utcOffset from first entry (minutes, e.g. -240 for UTC-4)
+    ' Read utcOffset from first entry (minutes, e.g. -240 for UTC-4). 
+    ' Nightscout entries carry the server's UTC offset in minutes, and imported for clock and axis-label TZ correction. 
     utcOffMin = 0
     offsetVal = data[0]["utcOffset"]
     if offsetVal <> invalid then utcOffMin = int(offsetVal)
@@ -222,6 +238,8 @@ sub doFetch()
 end sub
 
 sub doFetchBasals()
+    ' Fetches Temp basal treatments, ALWAYS 25 hours, or 300 records, worth. 
+    ' Fetching 25 hours worth of data keeps the vertical scale stable when the graph timespan changes. 
     baseUrl = m.top.nsUrl.trim()
     token   = m.top.nsToken.trim()
 
@@ -234,9 +252,7 @@ sub doFetchBasals()
         baseUrl = "https://" + mid(baseUrl, 8)
     end if
 
-    ' Always fetch 24h of basal data regardless of display window,
-    ' so vertical scale stays consistent when changing timespans.
-    count  = 25 * 12  ' 24h + 1h buffer at max ~12 temp basals/hr
+    count  = 25 * 12  ' 24h + 1h buffer at max, at 12 temp basals/hr
     if count < 48 then count = 48
 
     apiUrl = baseUrl + "/api/v1/treatments.json?count=" + count.ToStr()
@@ -259,14 +275,14 @@ sub doFetchBasals()
     data = ParseJson(msg.GetString())
     if data = invalid or type(data) <> "roArray" then return
 
-    ' Compute window
+    ' Compute window. 
     dtNow    = CreateObject("roDateTime")
     dtNow.Mark()
     nowSec   = dtNow.AsSeconds()
-    startSec = nowSec - 25 * 3600  ' always 24h+ window for scale consistency
+    startSec = nowSec - 25 * 3600  ' always 24h+ window for scale consistency. 
 
-    ' Build CSV: startSec,durationSec,rateTenths
-    ' rate stored as tenths of U/hr (e.g. 12 = 1.2 U/hr)
+    ' Build CSV (|SV aka PSV): startSec,durationSec,rateTenths. 
+    ' Rate stored as tenths of U/hr (e.g. 12 = 1.2 U/hr), just to dodge Brightscript's Floating Point issues. 
     result = ""
     for each t in data
         absolute = 0.0
@@ -280,7 +296,8 @@ sub doFetchBasals()
         ca = t["created_at"]
         if ca <> invalid then startT = isoToSec(ca.ToStr())
 
-        ' Include if it overlaps our 24h window
+        ' Filter to records in union with the 24 hour window. 
+        ' Records temp basal rate as INTEGER TENTHS of U/hr (e.g. 12 for 1.2 U/hr), just to dodge Brightscript's Floating Point issues. 
         endT = startT + duration * 60
         if startT > 0 and endT >= startSec
             rateTenths = int(absolute * 10.0 + 0.5)
@@ -294,6 +311,12 @@ end sub
 
 
 sub doFetchTreatments()
+    ' Fetch BOLUS Treatments. 
+    ' Brightscript issues with 32-bit integer overflows for epoch seconds timestamps are avoided, 
+    ' by accomodating a sufficient number of boluses (up to (hours+1)*6) count, rather than a date filter. 
+    ' That is, for a 4 hour plot, we'll be prepared for up to 30 boluses. 6 Boluses per hour should be plenty.
+    ' Nightscout returns treatments also in reverse-chronological order.
+    ' All date filtering is done in-scene, using integer seconds. 
     baseUrl  = m.top.nsUrl.trim()
     token    = m.top.nsToken.trim()
     hours    = m.top.graphHours
@@ -309,9 +332,6 @@ sub doFetchTreatments()
     end if
 
     ' Fetch enough treatments to cover the window.
-    ' Nightscout returns newest-first. ~6 boluses/hour is very generous,
-    ' so (hours+1)*6 covers virtually any real-world case.
-    ' We filter by date client-side to avoid integer overflow in ms arithmetic.
     count  = (hours + 1) * 6
     if count < 24 then count = 24
 
@@ -328,7 +348,7 @@ sub doFetchTreatments()
     http.SetMessagePort(port)
 
     if not http.AsyncGetToString() then return
-    msg = wait(10000, port)
+    msg = wait(10000, port) ' 10 seconds. 
     if msg = invalid or type(msg) <> "roUrlEvent" then return
     if msg.GetResponseCode() <> 200 then return
 
@@ -341,7 +361,7 @@ sub doFetchTreatments()
     nowSec   = dtNow.AsSeconds()
     startSec = nowSec - (hours + 1) * 3600
 
-    ' Build CSV: dateSec,insulin,carbs per bolus entry
+    ' Build CSV aka PSV: dateSec,insulin,carbs per bolus entry
     ' Only include entries with insulin >= bolusMin and within time window
     result = ""
     for each t in data
@@ -371,7 +391,7 @@ sub doFetchTreatments()
     m.top.treatments = result
 end sub
 
-' Convert epoch ms integer to ISO 8601 date string for API query
+' Convert epoch ms integer to ISO 8601 date string for API query. 
 function fromMsToISO(ms as LongInteger) as String
     sec = int(ms / 1000)
     dt  = CreateObject("roDateTime")
@@ -384,7 +404,7 @@ function fromMsToISO(ms as LongInteger) as String
     return y + "-" + mo + "-" + d + "T" + h + ":" + mn + ":00.000Z"
 end function
 
-' Parse ISO 8601 string "2025-03-25T14:30:00.000Z" to epoch seconds
+' Parse ISO 8601 string "2025-03-25T14:30:00.000Z" to epoch seconds. 
 function isoToSec(iso as String) as Integer
     if len(iso) < 19 then return 0
     yr  = left(iso, 4).ToInt()
@@ -394,7 +414,7 @@ function isoToSec(iso as String) as Integer
     mn  = mid(iso, 15, 2).ToInt()
     sc  = mid(iso, 18, 2).ToInt()
 
-    ' Days since epoch using Julian Day Number method
+    ' Days since epoch using Julian Day Number method. 
     a   = int((14 - mo) / 12)
     y2  = yr + 4800 - a
     m2  = mo + 12 * a - 3
@@ -405,12 +425,14 @@ function isoToSec(iso as String) as Integer
 end function
 
 function zp2(n as Integer) as String
+    'Adds leading zeros to integers, and returns a string.
     if n < 10 then return "0" + n.ToStr()
     return n.ToStr()
 end function
 
 
 sub doFetchDeviceStatus()
+    ' Fetches insulin pump battery information. 
     baseUrl = m.top.nsUrl.trim()
     token   = m.top.nsToken.trim()
     if baseUrl = "" then return
@@ -462,6 +484,15 @@ end sub
 
 
 sub doFetchPills()
+    ' Makes 5 HTTP requests, one per pill type.
+    '   Each has a 30-day lookback date filter. 
+    '   HTTP requests are sequential since this is is one task thread, and supports only one HTTP request at a time. 
+    ' Includes IAGE CAGE SAGE and BAGE
+        ' IAGE = Insulin age
+        ' CAGE = Canula age
+        ' SAGE = Sensor age (CGM)
+        ' BAGE = Battery age
+    
     baseUrl = m.top.nsUrl.trim()
     token   = m.top.nsToken.trim()
     if baseUrl = "" then return
@@ -473,7 +504,7 @@ sub doFetchPills()
         baseUrl = "https://" + mid(baseUrl, 8)
     end if
 
-    ' Fetch most recent treatment of each type
+    ' Fetch most recent treatment of each type. 
     ' Returns pipe-delimited: name,epochSec|name,epochSec|...
     types = [
         "cage:Site+Change",
@@ -489,7 +520,7 @@ sub doFetchPills()
         name  = parts[0]
         etype = parts[1]
 
-        ' Use 30-day lookback - sensor/cannula changes can be weeks ago
+        ' Use 30-day lookback - sensor/cannula changes could be as long as weeks ago. 
         dtP = CreateObject("roDateTime")
         dtP.Mark()
         lookbackSec = dtP.AsSeconds() - 30 * 86400
@@ -534,12 +565,21 @@ sub doFetchPills()
         end if
     end for
 
-    ' Append dbsize from status if available (we store it separately)
+    ' Append dbsize from status if available (we store it separately). 
     m.top.pills = result
 end sub
 
 
-sub doFetchStatus()
+sub doFetchStatus()    
+    ' Gets a list of things: 
+        ' Nightscout Site's Display name
+        ' List of ENABLED plugins, from the JSON field array, which this loops through and join space-delimited. 
+        ' List of SHOWN plugins, from the JSON field array, which this loops through and join space-delimited. 
+            ' In the scene, pluginEnabled() will check either concatenated list using instr(). 
+        ' Time Format (12h or 24h). 
+        ' WARN and URGENT thresholds for IAGE CAGE SAGE and BAGE. 
+            ' Avoiding assocarray for thresholds because alwaysNotify for assocarray unreliably triggers observers.
+            ' Instead, this encodes them as a 10-value CSV string. 
     baseUrl = m.top.nsUrl.trim()
     token   = m.top.nsToken.trim()
     if baseUrl = "" then return
@@ -601,8 +641,8 @@ sub doFetchStatus()
     tf = settings["timeFormat"]
     if tf <> invalid then m.top.timeFormat = int(val(tf.ToStr()))
 
-    ' Extract pill thresholds from extendedSettings
-    ' CAGE_WARN -> extendedSettings.cage.warn, etc.
+    ' Extract pill thresholds from extendedSettings...
+    ' CAGE_WARN -> extendedSettings.cage.warn, etc...
     ' BAGE_WARN_P -> extendedSettings.bage.warnP (percentage, not hours)
     cageWarn    = 72  : cageUrgent  = 96
     sageWarn    = 144 : sageUrgent  = 164
@@ -645,6 +685,13 @@ end sub
 
 
 sub doFetchProfile()
+    ' Fetches Nightscout treatment profile (Profile basals) from /api/v1/profile.json 
+        ' Profile basals are the pre-programmed basal rates based on time-of-day. 
+        ' This will encode them as minOfDay,rateTenth|... CSV/PSV. 
+        ' Profile basals will fill gaps in the temp basal plot, and usually provides data until temp basal data is reported. 
+    ' Also retrieves bgLow & bgHigh thresholds. 
+        ' These thresholds are used to color graph bands and glucose datapoints. 
+    ' Extra logic supports many anticipated Nightscout JSON structures, like arrays, objects, and nested under STORE. 
     baseUrl = m.top.nsUrl.trim()
     token   = m.top.nsToken.trim()
     if baseUrl = "" then return
@@ -680,7 +727,7 @@ sub doFetchProfile()
     if type(data) = "roArray" and data.Count() > 0 then prof = data[0]
     if prof = invalid then return
 
-    ' Extract bgLow and bgHigh -- Nightscout uses "low" and "high" in profile
+    ' Extract bgLow and bgHigh. Nightscout uses "low" and "high" in profile.
     bgLow  = 80
     bgHigh = 180
 
@@ -739,6 +786,7 @@ end sub
 
 
 function bgColor(mg as Integer) as String
+    ' Default Color Scales for Glucose Datapoints. 
     if mg < 55  then return "0xFF2222FF"
     if mg < 70  then return "0xFF6600FF"
     if mg > 250 then return "0xFF2222FF"
@@ -747,6 +795,7 @@ function bgColor(mg as Integer) as String
 end function
 
 function arrow(dir as String) as String
+    ' ASCII Text Arrow Generation based on trend description from Nightscout. 
     if dir = "DoubleUp"      then return "^^"
     if dir = "SingleUp"      then return "^"
     if dir = "FortyFiveUp"   then return "/^"
@@ -758,6 +807,7 @@ function arrow(dir as String) as String
 end function
 
 function fmtSec(sec as Integer) as String
+    ' Formats an epoch second as HH:mm. 
     d = CreateObject("roDateTime")
     d.FromSeconds(sec)
     h  = d.GetHours()
@@ -768,23 +818,27 @@ function fmtSec(sec as Integer) as String
 end function
 
 function regRead(key as String) as String
+    ' Wrapper for roRegistrySection using nightscout section, to read STRING keys. 
     sec = CreateObject("roRegistrySection", "nightscout")
     if sec.Exists(key) then return sec.Read(key)
     return ""
 end function
 
 function regReadInt(key as String, def as Integer) as Integer
+    ' Wrapper for roRegistrySection using nightscout section, to read INTEGER keys. 
     v = regRead(key)
     if v = "" then return def
     return v.ToInt()
 end function
 
 sub regWrite(key as String, val as String)
+    ' Wrapper for roRegistrySection using nightscout section, to write STRING keys. 
     sec = CreateObject("roRegistrySection", "nightscout")
     sec.Write(key, val)
     sec.Flush()
 end sub
 
 sub regWriteInt(key as String, val as Integer)
+    ' Wrapper for roRegistrySection using nightscout section, to write INTEGER keys. 
     regWrite(key, val.ToStr())
 end sub
