@@ -27,6 +27,7 @@ sub init() ' Runs when scene is created.
     m.timeLabelAge  = m.top.findNode("timeLabelAge")
     m.statusMsg   = m.top.findNode("statusMsg")
     m.graphGroup  = m.top.findNode("graphGroup")
+    m.footerHint  = m.top.findNode("footerHint")
     m.customTitle = m.top.findNode("customTitle")
     m.debugMsg     = m.top.findNode("debugMsg")
     m.iageLabel    = m.top.findNode("iageLabel")
@@ -69,6 +70,18 @@ sub init() ' Runs when scene is created.
     m.combinedBasals = []
     m.lastEntries    = []
     m.lastResult     = invalid
+
+	' Set footer hint text based on launch context (screensaver vs app mode). 
+    ' isScreensaver is set by runLive() in main.brs via the global node BEFORE the scene is created. 
+    ' If ran as Screensaver, then show only settings path, color nearly invisible - no interactive prompts. 
+    ' If ran as App, then show full button instructions in normal dim color. 
+    if m.global.isScreensaver = true
+        m.footerHint.text  = "To adjust: Roku Settings > Theme > Screensaver > NightscoutTV > Change screensaver settings"
+        m.footerHint.color = "0x1A1A2EFF"  ' Nearly invisible in screensaver mode - no interactive prompts shown.
+    else
+        m.footerHint.text  = "Left/Right = Graph Timespan   OK = Refresh   Back = Exit   Settings: Roku Settings > Theme > Screensaver"
+        m.footerHint.color = "0x2A2A44FF"  ' Normal dim color in app mode.
+    end if
 
     ' Task node refs - initialized to invalid, so that cleanup guards will work first run. 
     m.fetchTask   = invalid
