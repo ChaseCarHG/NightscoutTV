@@ -1,15 +1,15 @@
 CHANGELOG
 
-SATURDAY 28 Mar 2026 - V0.8.00001-Alpha
-  DEFAULTS
-  • Default display timespan - changed from 3 hours to 4 hours in all places. 
-    - All initial on-screen settings remain configurable. 
-    - Note that when installing via sideloading, the screensaver settings screen is available only immediately after install via sideload. This is a Roku platform limitation.  
-
-  STABILITY
-  • Performed line-by-line review of all code, and added comments heavily throughout. 
-
-
+SATURDAY 28 Mar 2026 - V0.8.00001-Alpha  
+  DEFAULTS  
+  • Default display timespan - changed from 3 hours to 4 hours in all places.   
+    - All initial on-screen settings remain configurable.   
+    - Note that when installing via sideloading, the screensaver settings screen is available only immediately after install via sideload. This is a Roku platform limitation.    
+  
+  STABILITY  
+  • Performed line-by-line review of all code, and added comments heavily throughout.   
+  
+  
 FRIDAY 27 Mar 2026
   DEFAULTS  
   • Default display bolus-threshold - changed from 0.5 to 0.1 in three places: The initial state, and the cycleBolus default index, and when no registry value exists.  
