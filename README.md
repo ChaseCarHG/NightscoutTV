@@ -78,7 +78,7 @@ The Roku platform is neither Safety-Grade nor Medical Grade. People change the c
 ---  
   
 ## HOW YOU CAN HELP  
-• Check out the [Issues list](https://github.com/ChaseCarHG/NightscoutTV/issues). 
+• Check out the [Issues list](https://github.com/ChaseCarHG/NightscoutTV/issues).  
 * Some items just need testing, and maybe your Nightscout server has what I don't have.  
 * Some items need localization. If you're interested in NightscoutTV support in YOUR language -- let me know in the issue for it!  
 * Some items warrant a developer who can handle Roku's Brightscript. There's enough already built out to learn from and scale to add those new features.  
