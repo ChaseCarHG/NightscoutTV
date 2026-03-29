@@ -1,10 +1,11 @@
 CHANGELOG    
 SUNDAY 29 MAR 2026 - v0.8.00011-Alpha  
-  IMPROVEMENTS  
+  BUGSFIXES  
+  • Fixed [Issue #2 - Testing Needed: 12 hour clock](https://github.com/ChaseCarHG/NightscoutTV/issues/2) in NightscoutLive.brs: Right-aligned clock text to graph edge.   
+  IMPROVEMENTS   
   • Fixed [Issue #1 - Add Scale Options beyond Logarithmic](https://github.com/ChaseCarHG/NightscoutTV/issues/1)  Added support for Scale per Nightscout server's config, either log or linear. Note log-dynamic falls back to log. Affected NightscoutLive and NightscoutTask files.   
-  BUGS  
-  • Fixed [Issue #2 - Testing Needed: 12 hour clock](https://github.com/ChaseCarHG/NightscoutTV/issues/2) in NightscoutLive.brs: Right-aligned clock text to graph edge.  
-  
+  • Fixed [Issue #6 - Enhancement: Scale Bolus Treatment Indicators (Rectangles & Font) with Dose Size, and Respect Bolus Display Preferences.](https://github.com/ChaseCarHG/NightscoutTV/issues/6)Implemented dynamic sizing of bolus treatments like Nightscout server, and formatting of its text labels to respect config from Nightscout server.  
+   
 SUNDAY 29 MAR 2026 - V0.8.00010-Alpha   
   PUBLICATION   
   • Updating INITIAL SUBMISSION to Roku Store.  
@@ -23,7 +24,7 @@ SATURDAY 28 MAR 2026 - V0.8.00008-Alpha
     - Failed to add anything to successfully clear Roku Store warning "EnableLowGeneralMemoryEvent usage not found." It doesn't seem to be implemented.  
     - Added explict exiting of onKeyPress when launched as a screensaver. This ensures screensaver is NOT interactive, to comply with Roku store checks, and actual practical OS limits.  
   
-  BUGS  
+  BUGFIXES  
   • Restored on-screen keyboard messages to provide users guidance on inputs needed (and promote the Nightscout Project too now).  
        
 SATURDAY 28 MAR 2026 - V0.8.00007-Alpha  
