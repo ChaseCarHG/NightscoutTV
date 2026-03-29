@@ -50,7 +50,6 @@ sub runLive(isScreensaver as Boolean)
     ' SetMessagePort routes memory events to the same port as screen events - one wait() handles both. 
     appMonitor = CreateObject("roAppMemoryMonitor")
     appMonitor.EnableMemoryWarningEvent(true)
-    appMonitor.EnableLowGeneralMemoryEvent(true)
     appMonitor.SetMessagePort(port)
 
     ' Log memory thresholds to port 8085 at startup for diagnostics. 
