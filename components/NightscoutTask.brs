@@ -53,13 +53,15 @@ sub doLoadSettings() ' Loads settings from Roku's persistent registry storage sy
 
     bolusMin    = regRead("bolusMinU")   : if bolusMin    = "" then bolusMin    = "0.1"
     basalRender = regRead("basalRender") : if basalRender = "" then basalRender = "icicle"
+    utcOff      = regReadInt("utcOffMin", 0)
     m.top.settingsLoaded = {
         url:         url,
         token:       token,
         unitsMgdl:   mgdl,
         graphHours:  hours,
         bolusMinU:   bolusMin,
-        basalRender: basalRender
+        basalRender: basalRender,
+        utcOffMin:   utcOff
     }
 end sub
 
@@ -77,6 +79,7 @@ sub doSaveSettings() ' Writes all settings to the persistent Roku registry, whic
     regWriteInt("graphHours", s.graphHours)
     if s.bolusMinU    <> invalid then regWrite("bolusMinU",    s.bolusMinU.ToStr())
     if s.basalRender  <> invalid then regWrite("basalRender",  s.basalRender.ToStr())
+    if s.utcOffMin    <> invalid then regWriteInt("utcOffMin", s.utcOffMin)
 end sub
 
 sub doFetch() ' Fetches CGM data from Nightscout Server's /api/v1/entries.json
