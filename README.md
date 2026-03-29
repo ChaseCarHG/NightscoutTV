@@ -89,7 +89,7 @@ The Roku platform is neither Safety-Grade nor Medical Grade. People change the c
 - Unfortunately, there's no Webkit or similar on Roku, so it all has to be made using Roku's available programming.  
 - **VALIDATE DATA RELIABILITY BEFORE MAKING DECISIONS ON IT.**
 
-## Screenshots
+## SCREENSHOTS
 ![002](https://github.com/user-attachments/assets/9d24fbfe-91a8-4bda-b488-a04e64137bdc)  
 ![003](https://github.com/user-attachments/assets/02629f78-30f0-4d80-a77b-37483dc513c0)  
 ... or Ctrl+Click below to preview shorter timespans...  
