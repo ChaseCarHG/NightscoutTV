@@ -275,7 +275,7 @@ sub showUrlDialog()
     m.dialogPurpose = "url" ' Early assignment to ensure dialog knows format and/or where to send results. 
     kbd = CreateObject("roSGNode", "StandardKeyboardDialog") ' Creates a StandardKeyboardDialog (built-in to Roku) named kbd. 
     kbd.title   = "Nightscout URL"
-    kbd.description = "Include https:// -- no trailing slash needed"
+    kbd.message = ["Include https:// -- no trailing slash needed", " ", "No server? Get set up!", "On your computer, browse to https://nightscout.github.io/"]
     kbd.buttons = ["Save", "Cancel"]
     kbd.observeFieldScoped("buttonSelected", "onDialogButton")
     m.top.dialog = kbd ' Assigned kbd to the m.top.dialog to show it. m.top.dialog is a special SceneGraph field that auto-displays when loaded with a dialog node. 
@@ -292,7 +292,7 @@ sub showTokenDialog()
     m.dialogPurpose = "token" ' Early assignment to ensure dialog knows format and/or where to send results. 
     kbd = CreateObject("roSGNode", "StandardKeyboardDialog") ' Creates a StandardKeyboardDialog (built-in to Roku) named kbd. 
     kbd.title   = "Access Token"
-    kbd.description = "If no token required, then leave blank."
+    kbd.message = ["If no token required, then leave blank."]
     kbd.buttons = ["Save", "Cancel"]
     kbd.observeFieldScoped("buttonSelected", "onDialogButton")
     m.top.dialog = kbd ' Assigned kbd to the m.top.dialog to show it. m.top.dialog is a special SceneGraph field that auto-displays when loaded with a dialog node. 
