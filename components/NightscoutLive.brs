@@ -151,16 +151,26 @@ end sub
 ' KEY EVENTS
 ' -----------------------------------------------------------------
 function onKeyEvent(key as String, press as Boolean) as Boolean
-    ' Simple here, three keys. 
-    if not press then return false ' Ignore key release events. We only want to look at key press events. 
-    if key = "back"
-        return false ' Let the Roku OS handle the BACK keypress. 
-    else if key = "select" or key = "OK" or key = "play" ' Triggers a manual doFetch() immediately. 
-        doFetch()
-        return true
-    else if key = "left" or key = "right" ' Left or Right will cycle the graph timespan, horizontal axis, and highlighted button. Requires new fetches. 
-        cycleHours(key)
-        return true
+  
+    ' ATTENTION ROKU REVIEWERS, REGARDING PROOVING NO INTERACTIVITY IN SCREENSAVER MODE... 
+    ' In screensaver mode, all keypresses are ignored - NO interactive functionality.  
+    ' Any screensaver-mode keypresses dismiss the screensaver at the OS level, before reaching this handler anyways. 
+    ' Here's our assurance of compliance with that rule: 
+    if m.global.isScreensaver = true then 
+        return false ' If screensaver mode, then ensure all onKeyEvent calls are passed to the Roku OS. 
+
+    else ' Wer're running in app mode...
+        ' Simple here, three keys. 
+        if not press then return false ' Ignore key release events. We only want to look at key press events. 
+        if key = "back"
+            return false ' Let the Roku OS handle the BACK keypress. 
+        else if key = "select" or key = "OK" or key = "play" ' Triggers a manual doFetch() immediately. 
+            doFetch()
+            return true
+        else if key = "left" or key = "right" ' Left or Right will cycle the graph timespan, horizontal axis, and highlighted button. Requires new fetches. 
+            cycleHours(key)
+            return true
+        end if
     end if
     return false
 end function
