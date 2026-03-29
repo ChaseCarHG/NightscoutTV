@@ -1,4 +1,12 @@
 CHANGELOG   
+SUNDAY 29 MAR 2026 - V0.8.00010-Alpha   
+  PUBLICATION   
+  • Updating INITIAL SUBMISSION to Roku Store. 
+  • Sent appeal to Roku to allow manually-launched app to remain interactive (for changing timespan displayed) while screensaver remains completely non-interactive. 
+
+  ENHANCEMENTS
+  • Condenced wording in keyboard guidance durign URL entry. 
+  
 SATURDAY 28 MAR 2026 - V0.8.00009-Alpha   
   PUBLICATION   
   • This version for INITIAL SUBMISSION to Roku Store  
