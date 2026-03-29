@@ -1,7 +1,7 @@
 CHANGELOG    
 SUNDAY 29 MAR 2026 - v0.8.00011-Alpha  
   BUGS  
-  • [Issue #2 - Testing Needed: 12 hour clock](https://github.com/ChaseCarHG/NightscoutTV/issues/2) fixed in NightscoutLive.brs to right-align clock text to graph edge.  
+  • Fixed [Issue #2 - Testing Needed: 12 hour clock](https://github.com/ChaseCarHG/NightscoutTV/issues/2) in NightscoutLive.brs: Right-aligned clock text to graph edge.  
   
 SUNDAY 29 MAR 2026 - V0.8.00010-Alpha   
   PUBLICATION   
