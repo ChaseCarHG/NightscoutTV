@@ -19,15 +19,17 @@
     <field id="profile"          type="assocarray"                     alwaysNotify="true" />
     <!-- First, more INPUT FIELDS. Written by scene, Read by task. -->
     <field id="basalSchedule"    type="string"       value=""          alwaysNotify="true" />
+    <field id="carbRatio"        type="string"       value=""          alwaysNotify="true" />
     <field id="nsCustomTitle"    type="string"       value="__unset__" alwaysNotify="true" />
     <field id="scaleY"           type="string"       value="log"       alwaysNotify="true" /> <!-- New for v0.8.00011-Alpha -->
+    <field id="bolusSettings"    type="string"       value=""          alwaysNotify="true" />
     <field id="enabledPlugins"   type="string"       value=""          alwaysNotify="true" />
     <field id="timeFormat"       type="integer"      value="12"        alwaysNotify="true" />
     <field id="pillThresholds"   type="string"       value=""          alwaysNotify="true" />
     <field id="batteryPct"       type="integer"      value="-1"        alwaysNotify="true" />
     <field id="pills"            type="string"       value=""          alwaysNotify="true" />
     <!-- Next, more INPUT FIELDS. Written by task, Read by scene. -->
-    <field id="bolusMinU"        type="float"        value="0.5"                           />
+    <field id="bolusMinU"        type="float"        value="0.1"                           />
     <field id="basalRender"      type="string"       value="icicle"                        />
     <field id="basals"           type="string"       value=""          alwaysNotify="true" />
     <field id="treatments"       type="string"       value=""          alwaysNotify="true" />
