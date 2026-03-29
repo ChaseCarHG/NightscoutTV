@@ -5,18 +5,6 @@
 ' This task is STATELESS. That is, every call creates a fresh task node, does its work, writes to output field, and exits. 
 ' That is, NO STATE PERSISTS BETWEEN CALLS. All state lives in the scene (NightscoutLive.brs) in m.* variables. 
 
-' Dead code stub - satisfies Roku static analyzer for memory API requirements.
-' These APIs are called in source/main.brs runLive(), and serve the entire app. 
-' The analyzer requires them to appear as code references within the components directory.
-sub _memoryApiStub()
-    app = CreateObject("roAppManager")
-    app.EnableLowGeneralMemoryEvent(false)
-    app.EnableMemoryWarningEvent(false)
-    app.GetMemoryLimitPercent()
-    app.GetChannelMemoryLimit()
-    app.GetChannelAvailableMemory()
-end sub
-
 sub init()
     m.top.functionName = "taskRun" ' m.top is the node itself. This tells Roku which function to call when the task's control field is set to RUN.
 end sub
