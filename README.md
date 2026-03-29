@@ -87,5 +87,24 @@ The Roku platform is neither Safety-Grade nor Medical Grade. People change the c
 ## MORE DETAILS  
   
 - Unfortunately, there's no Webkit or similar on Roku, so it all has to be made using Roku's available programming.  
-- **VALIDATE DATA RELIABILITY BEFORE MAKING DECISIONS ON IT.**  
+- **VALIDATE DATA RELIABILITY BEFORE MAKING DECISIONS ON IT.**
+
+## Screenshots
+![002](https://github.com/user-attachments/assets/9d24fbfe-91a8-4bda-b488-a04e64137bdc)  
+![003](https://github.com/user-attachments/assets/02629f78-30f0-4d80-a77b-37483dc513c0)  
+... or Ctrl+Click below to preview shorter timespans...  
+
+<a href="https://github.com/user-attachments/assets/296783df-f7c8-4d9a-beff-eb9b3ece2187" target="_blank">
+  <img src="https://github.com/user-attachments/assets/296783df-f7c8-4d9a-beff-eb9b3ece2187" width="200">
+</a>
+<a href="https://github.com/user-attachments/assets/bea7f1d6-bd9e-42ec-9733-63985462068b" target="_blank">
+  <img src="https://github.com/user-attachments/assets/bea7f1d6-bd9e-42ec-9733-63985462068b" width="200">
+</a>
+<a href="https://github.com/user-attachments/assets/9057b8f0-164e-43d2-92a2-c689413bcabc" target="_blank">
+  <img src="https://github.com/user-attachments/assets/9057b8f0-164e-43d2-92a2-c689413bcabc" width="200">
+</a>
+<a href="https://github.com/user-attachments/assets/7293fe23-5901-48b2-8045-b94e39005868" target="_blank">
+  <img src="https://github.com/user-attachments/assets/7293fe23-5901-48b2-8045-b94e39005868" width="200">
+</a>
+  
   
