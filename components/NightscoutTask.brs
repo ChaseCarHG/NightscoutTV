@@ -640,6 +640,27 @@ sub doFetchStatus()
     tf = settings["timeFormat"]
     if tf <> invalid then m.top.timeFormat = int(val(tf.ToStr()))
 
+    ' Read scaleY preference from Nightscout settings. 
+    ' Values: "log" (default), "linear", "log-dynamic" 
+    sv = settings["scaleY"]
+    if sv <> invalid
+        m.top.scaleY = LCase(sv.ToStr())
+    else
+        m.top.scaleY = "log"
+    end if
+    print "TASK WRITING SCALE-Y: " m.top.scaleY
+    
+    ' New for v0.8.00011-Alpha
+    ' Read scaleY preference from Nightscout settings.
+    ' Values: "log" (default), "linear", "log-dynamic"
+    sv = settings["scaleY"]
+    if sv <> invalid
+        m.top.scaleY = LCase(sv.ToStr())
+    else
+        m.top.scaleY = "log"
+    end if
+    ' New for v0.8.00011-Alpha
+    
     ' Extract pill thresholds from extendedSettings...
     ' CAGE_WARN -> extendedSettings.cage.warn, etc...
     ' BAGE_WARN_P -> extendedSettings.bage.warnP (percentage, not hours)
