@@ -57,7 +57,9 @@ sub runLive(isScreensaver as Boolean)
     print "MEMORY MONITOR INITIALIZED"
     print "  Limit %:   " appMonitor.GetMemoryLimitPercent()
     print "  Available: " appMonitor.GetChannelAvailableMemory() " bytes"
-    print "  Limit:     " appMonitor.GetChannelMemoryLimit() " bytes"
+    lim = appMonitor.GetChannelMemoryLimit()
+    print "  Limit (fg): " lim.maxForegroundMemory " bytes"
+    print "  Limit (bg): " lim.maxBackgroundMemory " bytes"
     print "=============================="
 
     ' Main event loop - runs for the lifetime of the live screen. The wait(0, port) blocks indefinitely until any message arrives.
@@ -77,7 +79,11 @@ sub runLive(isScreensaver as Boolean)
             print "MEMORY WARNING"
             print "  Available: " appMonitor.GetChannelAvailableMemory() " bytes"
             print "  Limit %:   " appMonitor.GetMemoryLimitPercent()
-            print "  Limit:     " appMonitor.GetChannelMemoryLimit() " bytes"
+            lim = appMonitor.GetChannelMemoryLimit()
+            print "  Available: " appMonitor.GetChannelAvailableMemory() " bytes"
+            print "  Limit %:   " appMonitor.GetMemoryLimitPercent()
+            print "  Limit (fg): " lim.maxForegroundMemory " bytes"
+            print "  Limit (bg): " lim.maxBackgroundMemory " bytes"
             print "=============================="
 
             if msg.isLowGeneralMemory()
