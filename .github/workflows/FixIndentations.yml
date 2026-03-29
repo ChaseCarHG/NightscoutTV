@@ -1,0 +1,30 @@
+name: Fix Indentation (Tabs to Spaces)
+
+on:
+  workflow_dispatch:  # run manually from the Actions tab
+
+jobs:
+  fix-tabs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Replace tabs with 4 spaces in .brs and .xml files
+        run: |
+          find . -type f \( -name "*.brs" -o -name "*.xml" \) | while read file; do
+            expand -t 4 "$file" > "$file.tmp" && mv "$file.tmp" "$file"
+          done
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git diff --quiet && echo "No tab changes found." || (
+            git add -A
+            git commit -m "style: replace tabs with 4 spaces in .brs and .xml files"
+            git push
+          )
