@@ -41,29 +41,33 @@ sub init() ' Runs when scene is created.
     }
 
     ' State Initialization: All m.* variables set to safe defaults. 
-    m.nsUrl         = ""
-    m.nsToken       = ""
-    m.unitsMgdl     = true
-    m.graphHours    = 4
-    m.bgLow         = 80
-    m.bgHigh        = 180
-    m.nsTitle       = ""
-    m.scaleY        = "log" ' New for v0.8.00011-Alpha
-    m.lastDebugInfo = ""
-    m.bolusMinU     = 0.1
-    m.basalRender   = "icicle"
-    m.enabledPlugins  = ""
-    m.pillData        = {}
-    m.timeFormat      = 12
-    m.utcOffMin       = 0
-    m.batteryPct      = -1 ' Sentinel value, means Not Yet Fetched. 
-    m.pillThresholds  = {cageWarn:72, cageUrgent:96, sageWarn:144, sageUrgent:164, iageWarn:44, iageUrgent:48, bageWarn:240, bageUrgent:360, bageWarnP:-1, bageUrgentP:-1} ' Defaults for functionality before status.json gets downloaded and processed. 
-    m.treatments    = []
-    m.basals        = []
-    m.basalSchedule  = []
-    m.combinedBasals = []
-    m.lastEntries    = []
-    m.lastResult     = invalid
+    m.nsUrl                  = ""
+    m.nsToken                = ""
+    m.unitsMgdl              = true
+    m.graphHours             = 4
+    m.bgLow                  = 80
+    m.bgHigh                 = 180
+    m.nsTitle                = ""
+    m.scaleY                 = "log" ' New for v0.8.00011-Alpha
+    m.lastDebugInfo          = ""
+    m.bolusMinU              = 0.1
+    m.basalRender            = "icicle"
+    m.enabledPlugins         = ""
+    m.pillData               = {}
+    m.timeFormat             = 12
+    m.utcOffMin              = 0
+    m.batteryPct             = -1 ' Sentinel value, means Not Yet Fetched. 
+    m.pillThresholds         = {cageWarn:72, cageUrgent:96, sageWarn:144, sageUrgent:164, iageWarn:44, iageUrgent:48, bageWarn:240, bageUrgent:360, bageWarnP:-1, bageUrgentP:-1} ' Defaults for functionality before status.json gets downloaded and processed. 
+    m.treatments             = []
+    m.basals                 = []
+    m.basalSchedule          = []
+    m.carbRatioSchedule      = [] ' Carb ratio schedule from profile. Default empty = use fallback of CR=10. 
+    m.combinedBasals         = []
+    m.bolusRenderOver        = 0.1    ' U threshold: below = small, at/above = large. 
+    m.bolusRenderFormat      = "default" ' large bolus label format. 
+    m.bolusRenderFormatSmall = "default" ' small bolus label format. 
+    m.lastEntries            = []
+    m.lastResult             = invalid
 
     ' Set footer hint text based on launch context (screensaver vs app mode). 
     ' isScreensaver is set by runLive() in main.brs via the global node BEFORE the scene is created. 
@@ -231,9 +235,10 @@ sub doFetchStatus()
     t = CreateObject("roSGNode", "NightscoutTask") ' Create a fresh task, set inputs, and observe output. 
     m.statusTask = t
     t.observeFieldScoped("nsCustomTitle",  "onStatus")
-    t.observeFieldScoped("scaleY", "onScaleY")
+    t.observeFieldScoped("scaleY",         "onScaleY")
     t.observeFieldScoped("pillThresholds", "onPillThresholds")
     t.observeFieldScoped("timeFormat",     "onTimeFormat")
+    t.observeFieldScoped("bolusSettings",  "onBolusSettings")
     
     t.nsUrl   = m.nsUrl
     t.nsToken = m.nsToken
@@ -261,6 +266,19 @@ sub onScaleY()
     sy = m.statusTask.scaleY
     if sy <> invalid and sy <> "" then m.scaleY = sy
     print "SCALE-Y RECEIVED IN SCENE: " m.scaleY
+end sub
+
+sub onBolusSettings()
+    ' Read result from task, store it in m.*, and trigger redraw. 
+    ' Used to read bolus render settings from status task (small vs large) that will allow customized label text formatting. 
+    ' Format: "renderOver|renderFormat|renderFormatSmall" 
+    csv = m.statusTask.bolusSettings
+    if csv = invalid or csv = "" then return
+    parts = csv.split("|")
+    if parts.Count() < 3 then return
+    m.bolusRenderOver        = val(parts[0])
+    m.bolusRenderFormat      = parts[1]
+    m.bolusRenderFormatSmall = parts[2]
 end sub
 
 sub doFetchBasals()
@@ -722,6 +740,7 @@ sub doFetchProfile()
     m.profileTask = t
     t.observeFieldScoped("profile",       "onProfile")
     t.observeFieldScoped("basalSchedule", "onBasalSchedule")
+    t.observeFieldScoped("carbRatio",     "onCarbRatio")
     t.nsUrl   = m.nsUrl
     t.nsToken = m.nsToken
     t.action  = "profile"
@@ -785,6 +804,49 @@ function scheduledRateAt(epochSec as Integer) as Integer
         end if
     end for
     return rate
+end function
+
+sub onCarbRatio()
+    ' Read carb ratio schedule from profile task, same pattern as onBasalSchedule(). 
+    csv = m.profileTask.carbRatio
+    if csv = invalid or csv = "" then return
+    result = []
+    for each entry in csv.split("|")
+        parts = entry.split(",")
+        if parts.Count() >= 2
+            result.Push({
+                minOfDay:   parts[0].ToInt(),
+                rateTenths: parts[1].ToInt()
+            })
+        end if
+    end for
+    ' Sort ascending by minOfDay 
+    n = result.Count()
+    for i = 1 to n - 1
+        key = result[i]
+        j   = i - 1
+        while j >= 0 and result[j].minOfDay > key.minOfDay
+            result[j + 1] = result[j]
+            j = j - 1
+        end while
+        result[j + 1] = key
+    end for
+    m.carbRatioSchedule = result
+end sub
+
+' Look up carb ratio (g/U as a float) for a given epoch second. 
+' Falls back to CR=10 if no schedule loaded. 
+function carbRatioAt(epochSec as Integer) as Float
+    if m.carbRatioSchedule = invalid or m.carbRatioSchedule.Count() = 0 then return 10.0
+    dt = CreateObject("roDateTime")
+    dt.FromSeconds(epochSec)
+    minOfDay = dt.GetHours() * 60 + dt.GetMinutes()
+    ' Walk schedule to find last entry <= minOfDay (same as scheduledRateAt) 
+    rateTenths = m.carbRatioSchedule[0].rateTenths
+    for each s in m.carbRatioSchedule
+        if s.minOfDay <= minOfDay then rateTenths = s.rateTenths
+    end for
+    return rateTenths / 10.0
 end function
 
 ' -----------------------------------------------------------------
@@ -1164,35 +1226,82 @@ sub drawGraph(entries as Object, hours as Integer, mgdl as Boolean)
                 else
                     by = PAT + GH / 2
                 end if
-                drawBolus(grp, bx, by, bolus.insulin, bolus.carbs)
+                drawBolus(grp, bx, by, bolus.insulin, bolus.carbs, bolus.dateSec, m.bolusRenderOver, m.bolusRenderFormat, m.bolusRenderFormatSmall)
             end if
         end for
     end if
 end sub
 
                                                                          
-sub drawBolus(grp as Object, cx as Integer, cy as Integer, insulinTenths as Integer, carbs as Integer)
+sub drawBolus(grp as Object, cx as Integer, cy as Integer, insulinTenths as Integer, carbs as Integer, dateSec as Integer, renderOver as Float, renderFormat as String, renderFormatSmall as String)
     ' Draw a bolus marker: white top half, blue bottom half, text above/below. 
-    ' BrightScript has no easy way to draw circles. Instead, we draw squares, made of two rectangles. 
-    ' Todo: Dynamic sizing of bolus markers. What does Nighscout do?
-    R = 10  ' radius (half-width of the pill)
-    ' White top half
-    mkRect(grp, cx - R,     cy - R*2, R*2, R,    "0xFFFFFFFF")
-    ' Blue bottom half
-    mkRect(grp, cx - R,     cy - R  , R*2, R,    "0x4488FFFF")
+    ' Scaling approximates Nightscout: Area proportional to dose (but NightscoutTV draws squares instead of circles, and so uses square area calcs). 
+    ' Nightscout: R = sqrt(insulin * CR) / scale  (circle radius) 
+    ' Square equivalent: similar, here R = half-width of square. 
+    ' CR looked up from profile carb ratio schedule at treatment time. 
+    SCALE = 0.55  ' TUNABLE: lower = bigger markers overall 
+    MIN_R = 6    ' minimum half-width in pixels 
+    MAX_R = 22   ' maximum half-width in pixels 
+
+    CR = carbRatioAt(dateSec)  ' g/U from profile schedule at bolus time. 
+
+    insulinU  = insulinTenths / 10.0
+    if carbs > 0
+        carbEquiv = carbs           ' Carbs: use directly. 
+    else
+        carbEquiv = insulinU * CR   ' Insulin: convert to carb-equivalent. 
+    end if
+
+    R = int(Sqr(carbEquiv) / SCALE)
+    if R < MIN_R then R = MIN_R
+    if R > MAX_R then R = MAX_R
+
+    
+    mkRect(grp, cx - R,     cy - R*2, R*2, R,    "0xFFFFFFFF") ' White top-half. 
+    mkRect(grp, cx - R,     cy - R,   R*2, R,    "0x0099FFFF") ' Blue bottom-half (#0099FF is Nightscout's insulin-blue). 
     ' Thin border outline
     mkRect(grp, cx - R,     cy - R*2, R*2, 1,    "0x000000AA")  ' top
     mkRect(grp, cx - R,     cy,       R*2, 1,    "0x000000AA")  ' bottom
     mkRect(grp, cx - R,     cy - R*2, 1,   R*2,  "0x000000AA")  ' left
     mkRect(grp, cx + R - 1, cy - R*2, 1,   R*2,  "0x000000AA")  ' right
-    ' Insulin text below
-    iWhole  = insulinTenths \ 10
-    iFrac   = insulinTenths mod 10 'Reconstructs decimal representation without using floating point formatting. 
-    iStr    = iWhole.ToStr() + "." + iFrac.ToStr() + "U"
-    mkLabel(grp, cx - 16, cy + 2, iStr, "0x88CCFFFF")
-    ' Carbs text above (if present)
+    ' Insulin text below, using label format based on renderOver threshold.
+    ' renderFormat applies to boluses >= renderOver (large).
+    ' renderFormatSmall applies to boluses < renderOver (small).
+    insulinU = insulinTenths / 10.0
+    iWhole   = insulinTenths \ 10
+    iFrac    = insulinTenths mod 10
+    fmt      = renderFormatSmall
+    if insulinU >= renderOver then fmt = renderFormat
+
+    iStr = ""
+    if fmt = "hidden"
+        ' No label - iStr stays empty
+    else if fmt = "minimal"
+        ' No leading zero, no U: ".5" or "5.7"
+        if iWhole = 0
+            iStr = "." + iFrac.ToStr()
+        else
+            iStr = iWhole.ToStr() + "." + iFrac.ToStr()
+        end if
+    else if fmt = "concise"
+        ' No leading zero, with U: ".5U" or "5.7U"
+        if iWhole = 0
+            iStr = "." + iFrac.ToStr() + "U"
+        else
+            iStr = iWhole.ToStr() + "." + iFrac.ToStr() + "U"
+        end if
+    else
+        ' "default": leading zero and U: "0.5U" or "5.7U"
+        iStr = iWhole.ToStr() + "." + iFrac.ToStr() + "U"
+    end if
+
+    if iStr <> ""
+        mkLabel(grp, cx - 16, cy + 4, iStr, "0x88CCFFFF")
+    end if
+    
+    ' Carbs text above (if present). 
     if carbs > 0
-        mkLabel(grp, cx - 12, cy - R*2 - 18, carbs.ToStr() + "g", "0xFFDD88FF")
+        mkLabel(grp, cx - 12, cy - R*2 - 22, carbs.ToStr() + "g", "0xFFDD88FF")
     end if
 end sub
 
