@@ -64,7 +64,7 @@ sub init() ' Runs when scene is created.
     m.lastEntries    = []
     m.lastResult     = invalid
 
-	' Set footer hint text based on launch context (screensaver vs app mode). 
+    ' Set footer hint text based on launch context (screensaver vs app mode). 
     ' isScreensaver is set by runLive() in main.brs via the global node BEFORE the scene is created. 
     ' If ran as Screensaver, then show only settings path, color nearly invisible - no interactive prompts. 
     ' If ran as App, then show full button instructions in normal dim color. 
@@ -180,7 +180,7 @@ end function
 sub refreshHourBtns()
     ' Highlight correct hour button for graph timescale. 
     ' Walks all six hour buttons and colors the active one bright blue and white, and the others dim. 
-	'  
+    '  
     ' In screensaver mode, dim unselected buttons further to reduce appearance  of interactive UI elements. 
     ' Selected button stays visible as it shows current graph timespan - informational, not interactive.
     opts = ["2", "3", "4", "6", "12", "24"]
@@ -268,7 +268,7 @@ sub onBasals()
     rebuildBasals()
 end sub
 
-																			
+                                                                            
 sub rebuildBasals()
     ' Combine temp basals + profile basals as gap-filler. Combined into m.combinedBasals. Then causes redraw. 
     ' The most complex logic in the file. Results in a single seamless timeline for the graph. 
@@ -1135,7 +1135,7 @@ sub drawGraph(entries as Object, hours as Integer, mgdl as Boolean)
     end if
 end sub
 
-																		 
+                                                                         
 sub drawBolus(grp as Object, cx as Integer, cy as Integer, insulinTenths as Integer, carbs as Integer)
     ' Draw a bolus marker: white top half, blue bottom half, text above/below. 
     ' BrightScript has no easy way to draw circles. Instead, we draw squares, made of two rectangles. 
@@ -1161,7 +1161,7 @@ sub drawBolus(grp as Object, cx as Integer, cy as Integer, insulinTenths as Inte
     end if
 end sub
 
-															  
+                                                              
 function nearestSgv(entries as Object, targetSec as Integer) as Integer
     ' Find the SGV value of the entry closest in time to targetSec. 
     best    = 0
@@ -1177,8 +1177,8 @@ function nearestSgv(entries as Object, targetSec as Integer) as Integer
     return best
 end function
 
-															  
-																	
+                                                              
+                                                                    
 function logY(mg as Integer) as Float
     ' Use Log() -- BrightScript DOES have Log() as natural log
     ' ln(x) via series or table -- use lookup table for our fixed values. 
