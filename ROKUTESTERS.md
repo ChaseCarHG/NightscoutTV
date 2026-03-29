@@ -52,7 +52,7 @@ We respectfully request that Requirement 4.5 be waived given the above.
   
 ===== CERTIFICATION WARNINGS =====  
   
-== WARNING 1 - 5 ==  
+== WARNING 1 ==  
 Re: EnableLowGeneralMemoryEvent warning  
 This API does not exist on Roku OS 15.1.   
 • Calling it on either roAppMemoryMonitor or roAppManager produces runtime error &hf4 — confirmed by crash testing on our target hardware.   
