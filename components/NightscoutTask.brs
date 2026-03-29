@@ -693,6 +693,21 @@ sub doFetchStatus()
             v = bg["warnP"]   : if v <> invalid then bageWarnP   = int(val(v.ToStr()))
             v = bg["urgentP"] : if v <> invalid then bageUrgentP = int(val(v.ToStr()))
         end if
+        
+        ' Extract bolus render settings from extendedSettings.bolus. 
+        ' renderOver: U threshold separating small from large bolus display. 
+        ' renderFormat: label format for large boluses ("default", "concise", "minimal", "hidden"). 
+        ' renderFormatSmall: label format for small boluses (same options). 
+        bolusRenderOver        = "0.1"    ' default: Show all boluses. 
+        bolusRenderFormat      = "default" ' large: "0.5U" style. 
+        bolusRenderFormatSmall = "default" ' small: Same by default. 
+        bl = ext["bolus"]
+        if type(bl) = "roAssociativeArray"
+            v = bl["renderOver"]        : if v <> invalid then bolusRenderOver        = v.ToStr()
+            v = bl["renderFormat"]      : if v <> invalid then bolusRenderFormat      = LCase(v.ToStr())
+            v = bl["renderFormatSmall"] : if v <> invalid then bolusRenderFormatSmall = LCase(v.ToStr())
+        end if
+        m.top.bolusSettings = bolusRenderOver + "|" + bolusRenderFormat + "|" + bolusRenderFormatSmall
     end if
     ' Emit as CSV: cageWarn,cageUrgent,sageWarn,sageUrgent,iageWarn,iageUrgent,bageWarn,bageUrgent,bageWarnP,bageUrgentP
     tCsv = cageWarn.ToStr() + "," + cageUrgent.ToStr()
@@ -800,6 +815,35 @@ sub doFetchProfile()
         end if
     end if
     m.top.basalSchedule = basalCSV
+    
+    ' Extract carb ratio schedule from profile store. 
+    ' carbratio can be a single number or a time-based array like basal. 
+    ' Encoded as minOfDay,rateTenths|... CSV (tenths of g/U for precision). 
+    carbCSV = ""
+    if type(profData) = "roAssociativeArray"
+        carbSched = profData["carbratio"]
+        if type(carbSched) = "roArray"
+            ' Time-based schedule: [{time:"HH:MM", value:N}, ...]
+            for each entry in carbSched
+                tStr = entry["time"]
+                vVal = entry["value"]
+                if tStr <> invalid and vVal <> invalid
+                    parts = tStr.ToStr().split(":")
+                    if parts.Count() >= 2
+                        minOfDay   = parts[0].ToInt() * 60 + parts[1].ToInt()
+                        rateTenths = int(val(vVal.ToStr()) * 10.0 + 0.5)
+                        if carbCSV <> "" then carbCSV = carbCSV + "|"
+                        carbCSV = carbCSV + minOfDay.ToStr() + "," + rateTenths.ToStr()
+                    end if
+                end if
+            end for
+        else if carbSched <> invalid
+        ' Single value: encode as minOfDay=0 
+        rateTenths = int(val(carbSched.ToStr()) * 10.0 + 0.5)
+        carbCSV = "0," + rateTenths.ToStr()
+        end if
+    end if
+    m.top.carbRatio = carbCSV
 
     m.top.profile = {bgLow: bgLow, bgHigh: bgHigh}
 end sub
