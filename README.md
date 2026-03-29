@@ -1,5 +1,6 @@
-# NightscoutTV for Roku  
+# NightscoutTV for Roku   
 A client screensaver/app for Roku to display read-only information from a running Nightscout server.  
+For a copy of these instructions with screenshots, go to the [Wiki section](https://github.com/ChaseCarHG/NightscoutTV/wiki).  
   
 ---  
   
