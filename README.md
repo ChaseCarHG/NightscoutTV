@@ -95,16 +95,16 @@ The Roku platform is neither Safety-Grade nor Medical Grade. People change the c
 ... or Ctrl+Click below to preview shorter timespans...  
 
 <a href="https://github.com/user-attachments/assets/296783df-f7c8-4d9a-beff-eb9b3ece2187" target="_blank">
-  <img src="https://github.com/user-attachments/assets/296783df-f7c8-4d9a-beff-eb9b3ece2187" width="250">
+  <img src="https://github.com/user-attachments/assets/296783df-f7c8-4d9a-beff-eb9b3ece2187" width="240">
 </a>
 <a href="https://github.com/user-attachments/assets/bea7f1d6-bd9e-42ec-9733-63985462068b" target="_blank">
-  <img src="https://github.com/user-attachments/assets/bea7f1d6-bd9e-42ec-9733-63985462068b" width="250">
+  <img src="https://github.com/user-attachments/assets/bea7f1d6-bd9e-42ec-9733-63985462068b" width="240">
 </a>
 <a href="https://github.com/user-attachments/assets/9057b8f0-164e-43d2-92a2-c689413bcabc" target="_blank">
-  <img src="https://github.com/user-attachments/assets/9057b8f0-164e-43d2-92a2-c689413bcabc" width="250">
+  <img src="https://github.com/user-attachments/assets/9057b8f0-164e-43d2-92a2-c689413bcabc" width="240">
 </a>
 <a href="https://github.com/user-attachments/assets/7293fe23-5901-48b2-8045-b94e39005868" target="_blank">
-  <img src="https://github.com/user-attachments/assets/7293fe23-5901-48b2-8045-b94e39005868" width="250">
+  <img src="https://github.com/user-attachments/assets/7293fe23-5901-48b2-8045-b94e39005868" width="240">
 </a>
   
   
