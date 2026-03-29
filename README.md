@@ -81,6 +81,7 @@ The Roku platform is neither Safety-Grade nor Medical Grade. People change the c
 ---  
   
 ## HOW YOU CAN HELP  
+• Check out the [Nightscout Project](https://nightscout.github.io/) and the [Nightscout Foundation](https://www.nightscoutfoundation.org/). Without their work, this project wouldn't be here.
 • Check out the [Issues list](https://github.com/ChaseCarHG/NightscoutTV/issues).  
 * Some items just need testing, and maybe your Nightscout server has what I don't have.  
 * Some items need localization. If you're interested in NightscoutTV support in YOUR language -- let me know in the issue for it!  
@@ -97,16 +98,16 @@ AGAIN -- VALIDATE DATA RELIABILITY BEFORE MAKING DECISIONS ON IT.
 ... or Ctrl+Click below to preview shorter timespans...  
 
 <a href="https://github.com/user-attachments/assets/296783df-f7c8-4d9a-beff-eb9b3ece2187" target="_blank">
-  <img src="https://github.com/user-attachments/assets/296783df-f7c8-4d9a-beff-eb9b3ece2187" width="245">
+  <img src="https://github.com/user-attachments/assets/296783df-f7c8-4d9a-beff-eb9b3ece2187" width="215">
 </a>
 <a href="https://github.com/user-attachments/assets/bea7f1d6-bd9e-42ec-9733-63985462068b" target="_blank">
-  <img src="https://github.com/user-attachments/assets/bea7f1d6-bd9e-42ec-9733-63985462068b" width="245">
+  <img src="https://github.com/user-attachments/assets/bea7f1d6-bd9e-42ec-9733-63985462068b" width="215">
 </a>
 <a href="https://github.com/user-attachments/assets/9057b8f0-164e-43d2-92a2-c689413bcabc" target="_blank">
-  <img src="https://github.com/user-attachments/assets/9057b8f0-164e-43d2-92a2-c689413bcabc" width="245">
+  <img src="https://github.com/user-attachments/assets/9057b8f0-164e-43d2-92a2-c689413bcabc" width="215">
 </a>
 <a href="https://github.com/user-attachments/assets/7293fe23-5901-48b2-8045-b94e39005868" target="_blank">
-  <img src="https://github.com/user-attachments/assets/7293fe23-5901-48b2-8045-b94e39005868" width="245">
+  <img src="https://github.com/user-attachments/assets/7293fe23-5901-48b2-8045-b94e39005868" width="215">
 </a>
   
   
