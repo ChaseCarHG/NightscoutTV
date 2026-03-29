@@ -1,10 +1,10 @@
-CHANGELOG  
-SATURDAY 28 MAR 2026 - V0.8.00008-Alpha  
-  PUBLICATION  
-  • To meet Roku Store Requirements:  
-    - Failed to add anything to successfully clear Roku Store warning "EnableLowGeneralMemoryEvent usage not found." It doesn't seem to be implemented.
-    - Added explict exiting of onKeyPress when launched as a screensaver. This ensures screensaver is NOT interactive, to comply with Roku store checks, and actual practical OS limits. 
-      
+CHANGELOG   
+SATURDAY 28 MAR 2026 - V0.8.00008-Alpha   
+  PUBLICATION   
+  • To meet Roku Store Requirements:   
+    - Failed to add anything to successfully clear Roku Store warning "EnableLowGeneralMemoryEvent usage not found." It doesn't seem to be implemented.  
+    - Added explict exiting of onKeyPress when launched as a screensaver. This ensures screensaver is NOT interactive, to comply with Roku store checks, and actual practical OS limits.   
+       
 SATURDAY 28 MAR 2026 - V0.8.00007-Alpha  
   PUBLICATION  
   • To meet Roku Store Requirements:  
