@@ -73,13 +73,15 @@
              font="font:SmallestSystemFont" translation="[402, 980]" />
       <Label id="bageLabel" text="" color="0x88FF88FF"
              font="font:SmallestSystemFont" translation="[598, 980]" />
-
-      <!-- Clock: right side, below graph x-axis, above footer, scale 4x, right-aligned with edge of graph -->
+      
+      <!-- New for v0.8.00011-Alpha -->
+      <!-- Clock: right side, below graph x-axis, above footer, scale 4x, right-aligned with edge of graph --> 
       <Label id="clockLabel" text=""
              font="font:LargeBoldSystemFont"
              scaleRotateCenter="[0,0]" scale="[4.0, 4.0]"
              horizAlign="right" width="230"
              color="0x888888FF" translation="[940, 870]" />
+      <!-- New for v0.8.00011-Alpha -->
 
       <Label id="footerHint" text="Left/Right = Graph Timespan   OK = Refresh   Back = Exit   Settings: Roku Settings > Theme > Screensaver"
              color="0x2A2A44FF" translation="[60, 1020]" />
