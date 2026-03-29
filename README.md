@@ -36,7 +36,8 @@ The Roku platform is neither Safety-Grade nor Medical Grade. People change the c
   
 ## INSTALLATION (MANUAL SIDELOADING INSTRUCTIONS)
   
-* Instead of Sideloading, recommend [installing NightscoutTV from the Roku Store directly](https://github.com/ChaseCarHG/NightscoutTV/wiki#installation). Sideloading is for developers, or until Roku publishes it.   
+* Instead of Sideloading, recommend [installing NightscoutTV from the Roku Store directly](https://github.com/ChaseCarHG/NightscoutTV/wiki#installation).
+  Sideloading is for developers, or until Roku publishes it.   
    
 1. Download all files — recommend the **Releases** section on the right. Download the `NightscoutTV.zip` file (**NOT** the source code zip).  
    - **a.** *(Optional, recommended for developers)* To ease on-TV setup, consider editing `NightscoutSetup.brs` at the two lines labeled `'CUSTOMIZE STRING BELOW TO EASE ROKU OSK INPUTS`.  
