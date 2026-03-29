@@ -19,18 +19,6 @@
 '
 ' https://github.com/ChaseCarHG/NightscoutTV/wiki
 
-' Dead code stub - satisfies Roku static analyzer for memory API requirements.
-' These APIs are called in source/main.brs runLive(), and serve the entire app. 
-' The analyzer requires them to appear as code references within the components directory.
-sub _memoryApiStub()
-    app = CreateObject("roAppManager")
-    app.EnableLowGeneralMemoryEvent(false)
-    app.EnableMemoryWarningEvent(false)
-    app.GetMemoryLimitPercent()
-    app.GetChannelMemoryLimit()
-    app.GetChannelAvailableMemory()
-end sub
-
 sub init()
     m.timer          = CreateObject("roSGNode", "Timer")
     m.timer.duration = 8
