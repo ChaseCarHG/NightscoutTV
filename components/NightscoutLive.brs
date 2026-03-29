@@ -48,6 +48,7 @@ sub init() ' Runs when scene is created.
     m.bgLow         = 80
     m.bgHigh        = 180
     m.nsTitle       = ""
+    m.scaleY        = "log" ' New for v0.8.00011-Alpha
     m.lastDebugInfo = ""
     m.bolusMinU     = 0.1
     m.basalRender   = "icicle"
@@ -230,8 +231,10 @@ sub doFetchStatus()
     t = CreateObject("roSGNode", "NightscoutTask") ' Create a fresh task, set inputs, and observe output. 
     m.statusTask = t
     t.observeFieldScoped("nsCustomTitle",  "onStatus")
+    t.observeFieldScoped("scaleY", "onScaleY")
     t.observeFieldScoped("pillThresholds", "onPillThresholds")
     t.observeFieldScoped("timeFormat",     "onTimeFormat")
+    
     t.nsUrl   = m.nsUrl
     t.nsToken = m.nsToken
     t.action  = "status"
@@ -240,7 +243,7 @@ end sub
 
 sub onStatus()
     ' Read result from task, store it in m.*, and trigger redraw. 
-    ' Used to read enabledPlugins, makes it all lowercase, stores it, then calls renderPills()
+    ' Used to read enabledPlugins, makes it all lowercase, stores it, then calls renderPills(). Also handles vertical-axis scaling.
     ct = m.statusTask.nsCustomTitle
     if ct <> invalid and ct <> "" and ct <> "__unset__" ' The weird unset default here is the sentinel, to ensure alwaysNotify fires on the first call. 
         m.nsTitle = ct
@@ -249,6 +252,15 @@ sub onStatus()
     ep = m.statusTask.enabledPlugins
     if ep <> invalid then m.enabledPlugins = LCase(ep)
     renderPills()
+end sub
+
+sub onScaleY()
+    ' New for v0.8.00011-Alpha
+    ' Read result from task, store it in m.*, and trigger redraw. 
+    ' Used to read scale for vertical axis.
+    sy = m.statusTask.scaleY
+    if sy <> invalid and sy <> "" then m.scaleY = sy
+    print "SCALE-Y RECEIVED IN SCENE: " m.scaleY
 end sub
 
 sub doFetchBasals()
@@ -967,6 +979,8 @@ end function
 ' Thresholds: m.bgLow, m.bgHigh (mg/dL, from profile or defaults)
 ' -----------------------------------------------------------------
 sub drawGraph(entries as Object, hours as Integer, mgdl as Boolean)
+    isLin = (m.scaleY = "linear")
+    print "DRAWGRAPH() SCALE-Y: " m.scaleY ", and useLinear will be: " isLin.ToStr()
     ' Rendering engine. On each call, rebuilds graph completely.  
     grp = m.graphGroup
     if grp = invalid then return
@@ -1018,6 +1032,11 @@ sub drawGraph(entries as Object, hours as Integer, mgdl as Boolean)
     ' Inversion since higher glucoses nead to appear towards top of chart which has LOWER Y coordinate values. 
     YMIN_MG = 40
     YMAX_MG = 400
+    ' New for v0.8.00011-Alpha: 
+    ' scaleY is read from Nightscout status.json via m.scaleY.
+    ' "log" = Logarithmic (default), "linear" = Linear.
+    ' "log-dynamic" is not yet implemented - falls back to "log".
+    useLinear = (m.scaleY = "linear") ' New for v0.8.00011-Alpha
     logMin  = logY(YMIN_MG)
     logMax  = logY(YMAX_MG)
     logSpan = logMax - logMin
@@ -1027,8 +1046,8 @@ sub drawGraph(entries as Object, hours as Integer, mgdl as Boolean)
 
     ' --- Colored bands ---
     ' Low band (below bgLow): red tint
-    yLow  = logPx(bgLow,  logMin, logSpan, PAT, GH)
-    yHigh = logPx(bgHigh, logMin, logSpan, PAT, GH)
+    yLow  = scalePx(bgLow,  useLinear, logMin, logSpan, PAT, GH) ' New for v0.8.00011-Alpha
+    yHigh = scalePx(bgHigh, useLinear, logMin, logSpan, PAT, GH) ' New for v0.8.00011-Alpha
     yBot  = PAT + GH
     mkRect(grp, PAL, yLow,  GW, yBot  - yLow,  "0xFF000028")
     ' High band (above bgHigh): amber tint
@@ -1078,10 +1097,16 @@ sub drawGraph(entries as Object, hours as Integer, mgdl as Boolean)
         end for
     end if
 
-    ' --- Grid lines (log scale ticks: 40,55,80,120,180,260,400) ---
-    ticks = [40, 55, 80, 120, 180, 260, 400]
+    ' New for v0.8.00011-Alpha
+    if useLinear
+        ' --- Grid lines (log scale ticks: 40, 80, 120, 160, 200, 240, 280, 320, 360, 400) ---
+        ticks = [40, 80, 120, 160, 200, 240, 280, 320, 360, 400]
+    else
+        ' --- Grid lines (log scale ticks: 40,55,80,120,180,260,400) ---
+        ticks = [40, 55, 80, 120, 180, 260, 400]
+    end if
     for each mg in ticks
-        yy  = logPx(mg, logMin, logSpan, PAT, GH)
+        yy  = scalePx(mg, useLinear, logMin, logSpan, PAT, GH) ' New for v0.8.00011-Alpha
         col = "0x334466AA"
         if mg = bgLow  then col = "0xFF660099"
         if mg = bgHigh then col = "0xFFAA0099"
@@ -1090,7 +1115,7 @@ sub drawGraph(entries as Object, hours as Integer, mgdl as Boolean)
 
     ' --- Y-axis labels ---
     for each mg in ticks
-        yy  = logPx(mg, logMin, logSpan, PAT, GH)
+        yy  = scalePx(mg, useLinear, logMin, logSpan, PAT, GH) ' New for v0.8.00011-Alpha
         lbl = fmtMg(mg, mgdl)
         mkLabel(grp, 2, yy - 10, lbl, "0x888888FF")
     end for
@@ -1120,7 +1145,7 @@ sub drawGraph(entries as Object, hours as Integer, mgdl as Boolean)
         es = e.dateSec
         if es >= startSec - 30 and es <= nowSec + 60
             xp = PAL + int((es - startSec) / spanSec * GW)
-            yp = logPx(e.sgv, logMin, logSpan, PAT, GH)
+            yp = scalePx(e.sgv, useLinear, logMin, logSpan, PAT, GH) ' New for v0.8.00011-Alpha
             mkRect(grp, xp - DOT/2, yp - DOT/2, DOT, DOT, gBgColor(e.sgv, bgLow, bgHigh))
         end if
         i = i - 1
@@ -1135,7 +1160,7 @@ sub drawGraph(entries as Object, hours as Integer, mgdl as Boolean)
                 ' Find nearest glucose y position
                 bSgv = nearestSgv(entries, bs)
                 if bSgv > 0
-                    by = logPx(bSgv, logMin, logSpan, PAT, GH)
+                    by = scalePx(bSgv, useLinear, logMin, logSpan, PAT, GH) ' New for v0.8.00011-Alpha
                 else
                     by = PAT + GH / 2
                 end if
@@ -1195,6 +1220,16 @@ function logY(mg as Integer) as Float
     ' In case old Roku OS lacks log() function, modify this. 
     if mg < 1 then mg = 1
     return Log(mg)
+end function
+
+' New for v0.8.00011-Alpha: scalePx
+' Scale-aware Y pixel mapper. Delegates to logPx or gYPx based on useLinear flag. 
+function scalePx(mg as Integer, useLinear as Boolean, logMin as Float, logSpan as Float, padT as Integer, gH as Integer) as Integer
+    if useLinear
+        return gYPx(mg, 40, 400, padT, gH)
+    else
+        return logPx(mg, logMin, logSpan, padT, gH)
+    end if
 end function
 
 function logPx(mg as Integer, logMin as Float, logSpan as Float, padT as Integer, gH as Integer) as Integer
