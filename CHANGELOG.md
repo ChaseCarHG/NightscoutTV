@@ -1,4 +1,8 @@
-CHANGELOG    
+CHANGELOG     
+SUNDAY 29 MAR 2026 - v0.8.00012-Alpha  
+  BUGFIXES  
+  • Tweaks to save timezone after retrieved from server (for after first launch). Prevents clock display from lagging for up to a minute (after first launch).   
+  
 SUNDAY 29 MAR 2026 - v0.8.00011-Alpha  
   BUGSFIXES  
   • Fixed [Issue #2 - Testing Needed: 12 hour clock](https://github.com/ChaseCarHG/NightscoutTV/issues/2) in NightscoutLive.brs: Right-aligned clock text to graph edge.   
