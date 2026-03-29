@@ -124,6 +124,7 @@ sub onSettingsLoaded()
     m.graphHours = s.graphHours
     if s.bolusMinU   <> invalid then m.bolusMinU   = val(s.bolusMinU.ToStr())
     if s.basalRender <> invalid then m.basalRender = s.basalRender.ToStr()
+    if s.utcOffMin   <> invalid then m.utcOffMin   = s.utcOffMin ' Read and apply the saved offset before starting the clock. Since startClock() is called right after, the clock will now tick in local time from the very first second on every launch (after the first launch).
     if left(m.nsUrl, 7) = "http://" ' Again ensure secure connection. 
         m.nsUrl = "https://" + mid(m.nsUrl, 8)
     end if
@@ -964,7 +965,10 @@ sub processResult(r as Object)
     parts = r.entriesCSV.split("|")
     m.debugMsg.text = "OK.  " + bgDisp + " " + unitStr + ".  Values Loaded: " + parts.Count().ToStr() + "."
 
-    if r.utcOffMin <> invalid then m.utcOffMin = r.utcOffMin
+    if r.utcOffMin <> invalid and r.utcOffMin <> m.utcOffMin 'If the timezone offset has actually changed...
+        m.utcOffMin = r.utcOffMin ' ...then lets save that data.
+        saveSettings()  ' Persist so clock localizes instantly on next launch. 
+    end if
     entries = parseEntriesCSV(r.entriesCSV)
     m.lastEntries = entries
     rebuildBasals()
