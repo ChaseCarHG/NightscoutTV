@@ -1,5 +1,7 @@
 CHANGELOG    
 SUNDAY 29 MAR 2026 - v0.8.00011-Alpha  
+  IMPROVEMENTS  
+  • Fixed [Issue #1 - Add Scale Options beyond Logarithmic](https://github.com/ChaseCarHG/NightscoutTV/issues/1)  Added support for Scale per Nightscout server's config, either log or linear. Note log-dynamic falls back to log. Affected NightscoutLive and NightscoutTask files.   
   BUGS  
   • Fixed [Issue #2 - Testing Needed: 12 hour clock](https://github.com/ChaseCarHG/NightscoutTV/issues/2) in NightscoutLive.brs: Right-aligned clock text to graph edge.  
   
