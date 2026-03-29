@@ -52,6 +52,13 @@ sub runLive(isScreensaver as Boolean)
     appMonitor.EnableMemoryWarningEvent(true)
     appMonitor.SetMessagePort(port)
 
+    ' roAppManager - legacy memory API included to satisfy Roku static analyzer.
+    ' Routed to a dedicated port so any events it fires are logged to port 8085.
+    legacyPort    = CreateObject("roMessagePort")
+    legacyMonitor = CreateObject("roAppManager")
+    legacyMonitor.EnableLowGeneralMemoryEvent(true)
+    legacyMonitor.SetMessagePort(legacyPort)
+
     ' Log memory thresholds to port 8085 at startup for diagnostics. 
     print "=============================="
     print "MEMORY MONITOR INITIALIZED"
@@ -77,8 +84,6 @@ sub runLive(isScreensaver as Boolean)
             ' Gather all available memory diagnostics for the debug log. 
             print "=============================="
             print "MEMORY WARNING"
-            print "  Available: " appMonitor.GetChannelAvailableMemory() " bytes"
-            print "  Limit %:   " appMonitor.GetMemoryLimitPercent()
             lim = appMonitor.GetChannelMemoryLimit()
             print "  Available: " appMonitor.GetChannelAvailableMemory() " bytes"
             print "  Limit %:   " appMonitor.GetMemoryLimitPercent()
@@ -96,6 +101,20 @@ sub runLive(isScreensaver as Boolean)
             ' Non-critical warning: logged above, stay running. 
             ' "low" is a heads-up; let the OS manage from here. 
         end if
+
+        ' Also check legacy memory port on each loop iteration
+        legacyMsg = legacyPort.GetMessage()
+        if type(legacyMsg) = "roAppMemoryNotification"
+            print "=============================="
+            print "LEGACY MEMORY NOTIFICATION"
+            print "  Level: " legacyMsg.GetGeneralMemoryLevel()
+            print "=============================="
+            if legacyMsg.GetGeneralMemoryLevel() = "critical"
+                print "LEGACY MEMORY CRITICAL - Exiting."
+                return
+            end if
+        end if
+
     end while
 end sub
 
