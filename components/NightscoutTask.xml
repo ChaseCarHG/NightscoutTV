@@ -20,6 +20,7 @@
     <!-- First, more INPUT FIELDS. Written by scene, Read by task. -->
     <field id="basalSchedule"    type="string"       value=""          alwaysNotify="true" />
     <field id="nsCustomTitle"    type="string"       value="__unset__" alwaysNotify="true" />
+    <field id="scaleY"           type="string"       value="log"       alwaysNotify="true" /> <!-- New for v0.8.00011-Alpha -->
     <field id="enabledPlugins"   type="string"       value=""          alwaysNotify="true" />
     <field id="timeFormat"       type="integer"      value="12"        alwaysNotify="true" />
     <field id="pillThresholds"   type="string"       value=""          alwaysNotify="true" />
