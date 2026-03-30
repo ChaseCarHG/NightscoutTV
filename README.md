@@ -94,20 +94,24 @@ AGAIN -- VALIDATE DATA RELIABILITY BEFORE MAKING DECISIONS ON IT.
   
 ## SCREENSHOTS
 ![002](https://github.com/user-attachments/assets/9d24fbfe-91a8-4bda-b488-a04e64137bdc)  
-![003](https://github.com/user-attachments/assets/02629f78-30f0-4d80-a77b-37483dc513c0)  
+![NightscoutTV-Demo-24hr](https://github.com/user-attachments/assets/b0001de4-e05f-4a20-8870-d7b30ed551bf)
+
 ... or Ctrl+Click below to preview shorter timespans...  
 
-<a href="https://github.com/user-attachments/assets/296783df-f7c8-4d9a-beff-eb9b3ece2187" target="_blank">
-  <img src="https://github.com/user-attachments/assets/296783df-f7c8-4d9a-beff-eb9b3ece2187" width="24%">
+<a href="https://github.com/user-attachments/assets/eebdfa2b-c256-4a06-bbaf-6fd63f124c97" target="_blank">
+  <img src="https://github.com/user-attachments/assets/eebdfa2b-c256-4a06-bbaf-6fd63f124c97" width="19%">
 </a>
-<a href="https://github.com/user-attachments/assets/bea7f1d6-bd9e-42ec-9733-63985462068b" target="_blank">
-  <img src="https://github.com/user-attachments/assets/bea7f1d6-bd9e-42ec-9733-63985462068b" width="24%">
+<a href="https://github.com/user-attachments/assets/06d30745-d2f0-49fc-828d-795357dea753" target="_blank">
+  <img src="https://github.com/user-attachments/assets/06d30745-d2f0-49fc-828d-795357dea753" width="19%">
 </a>
-<a href="https://github.com/user-attachments/assets/9057b8f0-164e-43d2-92a2-c689413bcabc" target="_blank">
-  <img src="https://github.com/user-attachments/assets/9057b8f0-164e-43d2-92a2-c689413bcabc" width="24%">
+<a href="https://github.com/user-attachments/assets/66c442c7-24f1-4360-a540-12b0ec8ce723" target="_blank">
+  <img src="https://github.com/user-attachments/assets/66c442c7-24f1-4360-a540-12b0ec8ce723" width="19%">
 </a>
-<a href="https://github.com/user-attachments/assets/7293fe23-5901-48b2-8045-b94e39005868" target="_blank">
-  <img src="https://github.com/user-attachments/assets/7293fe23-5901-48b2-8045-b94e39005868" width="24%">
+<a href="https://github.com/user-attachments/assets/39993489-6e36-4341-9c00-ad43f10b1688" target="_blank">
+  <img src="https://github.com/user-attachments/assets/39993489-6e36-4341-9c00-ad43f10b1688" width="19%">
+</a>
+<a href="https://github.com/user-attachments/assets/a274bc68-2e98-4eee-b93d-0e18445217f1" target="_blank">
+  <img src="https://github.com/user-attachments/assets/a274bc68-2e98-4eee-b93d-0e18445217f1" width="19%">
 </a>
   
   
