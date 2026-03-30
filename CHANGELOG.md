@@ -1,4 +1,8 @@
 CHANGELOG     
+SUNDAY 29 MAR 2026 - v0.8.00013-Alpha  
+  COMPATIBILITY  
+  • Addressing [Issue #8 - Enhancement: Support Older Roku OS Versions](https://github.com/ChaseCarHG/NightscoutTV/issues/8) by declaring Minimum Roku OS of v10, and (Roku Scenegraph) rsg_version=1.2, at least until October 2026 when Roku App Certification requirements may be subject to change.   
+  
 SUNDAY 29 MAR 2026 - v0.8.00012-Alpha  
   BUGFIXES  
   • Tweaks to save timezone after retrieved from server (for after first launch). Prevents clock display from lagging for up to a minute (after first launch).   
