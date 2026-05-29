@@ -9,6 +9,9 @@
 ' NUM_ROWS = 4  (used as literals below)
 
 sub init() ' Runs when scene is created. 
+    ' Before anything, print debug output to determine launch mechanism: 
+    print "INIT STARTED - isScreensaver: " m.global.isScreensaver.ToStr()
+
     ' First, grab node references (for the live screen nodes only). 
     ' Each walks the XML tree and returns a live reference to the named node, to store in the m.* variable.
     ' Keeps the BRS from having to search the tree every time. 
@@ -109,13 +112,18 @@ sub init() ' Runs when scene is created.
     m.loadTask.observeFieldScoped("settingsLoaded", "onSettingsLoaded")
     m.loadTask.action  = "load"
     m.loadTask.control = "RUN"
+    print "LOAD TASK CREATED AND RUNNING"
 
     m.top.setFocus(true)
 end sub
 
 sub onSettingsLoaded()
+    'First, providing debug output...
+    print "onSettingsLoaded Fired"
+
     ' Once settings are loaded from the registry, this fires and gets real display work done. 
     s = m.loadTask.settingsLoaded
+    print "URL from Registry: " s.url
     if s = invalid then return
     ' Store all settings into m.* variables. 
     m.nsUrl      = s.url
