@@ -1,9 +1,9 @@
 CHANGELOG     
 
-FRIDAY 29 MAY 2926 0 v0.8.00014-Alpha
-  DEBUGGING ONLY
-  • Working [Issue #11 - No data loaded when launched as Screensaver, yet launches as app works fine.](https://github.com/ChaseCarHG/NightscoutTV/issues/11) by adding debug statements in NightscoutLive.brs around init() and onSettingsLoaded(). 
-  • NOTE: Roku has screensaver debugging output go to :8087 (RAW). 
+FRIDAY 29 MAY 2926 0 v0.8.00014-Alpha  
+  DEBUGGING ONLY  
+  • Working [Issue #11 - No data loaded when launched as Screensaver, yet launches as app works fine.](https://github.com/ChaseCarHG/NightscoutTV/issues/11) by adding debug statements in NightscoutLive.brs around init() and onSettingsLoaded().  
+  • NOTE: Roku has screensaver debugging output go to :8087 (RAW).  
 
 SUNDAY 29 MAR 2026 - v0.8.00013-Alpha  
   COMPATIBILITY  
