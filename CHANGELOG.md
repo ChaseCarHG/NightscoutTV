@@ -2,7 +2,7 @@ CHANGELOG
   
 TUESDAY 02 JUNE 2926 0 v0.8.00015-Alpha  
 DEBUGGING ONLY  
-• Working https://github.com/ChaseCarHG/NightscoutTV/issues/11 by changing main.brs to exit more gracefully and clean up after itself.  
+• Working [Issue #11 - No data loaded when launched as Screensaver, yet launches as app works fine.](https://github.com/ChaseCarHG/NightscoutTV/issues/11) by changing main.brs to exit more gracefully and clean up after itself.  
 • NOTE: Roku has screensaver debugging output go to :8087 (RAW).  
   
 FRIDAY 29 MAY 2926 0 v0.8.00014-Alpha  
