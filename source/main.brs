@@ -66,6 +66,8 @@ sub runLive(isScreensaver as Boolean)
     while true
         msg = wait(0, port)
 
+        if msg.isScreenClosed() then exit while
+
         if type(msg) = "roSGScreenEvent"
             ' Screen was closed (e.g. user pressed Back, or OS dismissed screensaver).
             ' Returning here exits runLive() and returns control to the caller
@@ -89,13 +91,22 @@ sub runLive(isScreensaver as Boolean)
                 ' Exit gracefully now so the OS can reclaim our memory cleanly. 
                 ' The user will be returned to the Roku home screen. 
                 print "MEMORY CRITICAL - Exiting gracefully to free resources."
-                return
+                exit while
             end if
             ' Non-critical warning: logged above, stay running. 
             ' "low" is a heads-up; let the OS manage from here. 
         end if
 
     end while
+    
+    ' Explicit cleanup - null all refs so GC reclaims immediately. 
+    ' Prevents lingering instances across screensaver launches.
+    print "runLive() exiting - releasing resources"
+    screen = invalid
+    port = invalid
+    appMonitor = invalid
+    lim = invalid
+    print "runLive resource releases completed"
 end sub
 
 
