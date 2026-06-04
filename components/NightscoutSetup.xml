@@ -68,7 +68,7 @@
     <!-- Disclaimer overlay: Shown for 8s on first open, then hidden. -->
     <!-- Sits outside the bg Rectangle. So it renders on top of everything else in the scene. -->
     <Rectangle id="disclaimerOverlay" width="1920" height="1080"
-               color="0x000000FF" visible="true"> <!-- Default initially visible, for the BRS to hide via disclaimerOverlay visible="false" after it appears for long enough. --> 
+               color="0x000000FF" visible="false"> <!-- Default initially HIDDEN, for the BRS to SHOW via disclaimerOverlay visible="true" then after it appears for long enough visible="false". --> 
       <Poster id="disclaimerPoster" uri="pkg:/images/splash_hd.png"
               width="1920" height="1080" />
     </Rectangle>
