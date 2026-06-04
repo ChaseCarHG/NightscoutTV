@@ -1,6 +1,6 @@
 CHANGELOG   
 
-THURSDAY 04 June 2026 - v0.8.00016-Alpha
+THURSDAY 04 June 2026 - v0.8.00016-Alpha  
 • Working [Issue #12 - Disclaimer Screen hides manually-launched Screensaver Settings Page](https://github.com/ChaseCarHG/NightscoutTV/issues/12) in NightscoutSetup.brs init(), moved m.top.setFocus(true) to the very first line of init() instead of after the timer is created.  
 • Working [Issue #11 - No data loaded when launched as Screensaver, yet launches as app works fine.](https://github.com/ChaseCarHG/NightscoutTV/issues/11), in NightscoutLive.brs sub onSettingsLoaded(): Rearranged first use of s.url to occur AFTER checking for loadTask validity (with debug output) and AFTER checking for s validity (with debug output).   
   
