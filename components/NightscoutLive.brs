@@ -121,10 +121,19 @@ sub onSettingsLoaded()
     'First, providing debug output...
     print "onSettingsLoaded Fired"
 
+    if m.loadTask = invalid then
+        print "ERROR: loadTask is invalid in NightscoutLive.brs onSettingsLoaded()"
+        return
+    end if
+
     ' Once settings are loaded from the registry, this fires and gets real display work done. 
     s = m.loadTask.settingsLoaded
+    if s = invalid then 
+        print "ERROR: settingsLoaded is invalid in NightscoutLive.brs onSettingsLoaded()"
+        return
+    end if
     print "URL from Registry: " s.url
-    if s = invalid then return
+
     ' Store all settings into m.* variables. 
     m.nsUrl      = s.url
     m.nsToken    = s.token
