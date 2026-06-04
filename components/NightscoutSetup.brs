@@ -22,8 +22,10 @@ sub init() ' Runs when scene is created.
     m.setupStatus        = m.top.findNode("setupStatus")
     m.disclaimerOverlay  = m.top.findNode("disclaimerOverlay")
 
-    ' Disclaimer timer - Hide overlay after 8 seconds.
+    ' Disclaimer timer - Show, then after 8 seconds Hide overlay.
     ' Timer is built-in to SceneGraph. 
+    m.disclaimerOverlay.visible = true
+    print "Commanded m.disclaimerOverlay.visible = true"
     m.discTimer          = CreateObject("roSGNode", "Timer")
     m.discTimer.duration = 8
     m.discTimer.repeat   = false
