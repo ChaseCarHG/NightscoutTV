@@ -55,7 +55,8 @@ sub init() ' Runs when scene is created.
 end sub
 
 sub onDisclaimerTimer()
-    print "DISCLAIMER TIMER FIRED - Overlay Valid: " (m.disclaimerOverlay <> invalid).ToStr() " visible before: " m.disclaimerOverlay.visible.ToStr()
+    isValid = (m.disclaimerOverlay <> invalid)
+    print "DISCLAIMER TIMER FIRED - Overlay Valid: " isValid " visible before: " m.disclaimerOverlay.visible
     ' Called 8 seconds after screen opens to hide the disclaimer. 
     if m.disclaimerOverlay <> invalid ' Best practice. m.disclaimerOverlay is expected to remain valid. 
         m.disclaimerOverlay.visible = false
