@@ -2,6 +2,9 @@
 ' Row 0=URL, Row 1=Token, Row 2=Units, Row 3=Default Display, Row 4=Bolus Threshold, Row 5=Save
 
 sub init() ' Runs when scene is created. 
+    ' Prereq -- ensure SceneGraph knows this component should receive key events. 
+    m.top.setFocus(true)
+    
     ' First, grab node references. 
     ' Each walks the XML tree and returns a live reference to the named node, to store in the m.* variable.
     ' Keeps the BRS from having to search the tree every time. 
@@ -49,8 +52,6 @@ sub init() ' Runs when scene is created.
     m.loadTask.action  = "load"
     m.loadTask.control = "RUN"
     
-    ' Ensure SceneGraph knows this component should receive key events. 
-    m.top.setFocus(true)
 end sub
 
 sub onDisclaimerTimer()
