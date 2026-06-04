@@ -1,5 +1,8 @@
 CHANGELOG   
   
+THURSDAY 04 June 2026 - v0.8.00019-Alpha   
+• Working [Issue #12 - Disclaimer Screen hides manually-launched Screensaver Settings Page]  (https://github.com/ChaseCarHG/NightscoutTV/issues/12), changing disclaimer to start as visible="false" in the NightscoutSetup.xml, then have its .brs make disclaimerOverlay visible="true" then once it has been long enough its .brs will make disclaimerOverlay visible="false"  
+  
 THURSDAY 04 June 2026 - v0.8.00018-Alpha  
 • Working [Issue #12 - Disclaimer Screen hides manually-launched Screensaver Settings Page](https://github.com/ChaseCarHG/NightscoutTV/issues/12), fixed bad debug printing use of inline .toStr().  
   
