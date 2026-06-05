@@ -1089,9 +1089,11 @@ sub drawGraph(entries as Object, hours as Integer, mgdl as Boolean)
     grp = m.graphGroup
     if grp = invalid then return
 
-    while grp.getChildCount() > 0
-        grp.removeChildIndex(0) ' Empty the graph completely, to avoid any stale data or artifacts. 
-    end while
+    ''Replacing removeChildIndex loop with faster and more memory-friendly operation for Issue #11
+    'while grp.getChildCount() > 0
+        'grp.removeChildIndex(0) ' Empty the graph completely, to avoid any stale data or artifacts. 
+    'end while
+    grp.removeChildren(grp.getChildren(-1, 0)) ' Remove all children atomically, faster and cleaner for GC.
 
     if entries = invalid or entries.Count() = 0 then return
 
@@ -1439,6 +1441,7 @@ sub mkRect(grp as Object, x as Integer, y as Integer, w as Integer, h as Integer
     r.width  = w
     r.height = h
     r.color  = col
+    r.invalid ' Release ref immediately - grp owns it now. To help with Issue #11.
 end sub
 
 sub mkLabel(grp as Object, x as Integer, y as Integer, txt as String, col as String)
@@ -1448,4 +1451,5 @@ sub mkLabel(grp as Object, x as Integer, y as Integer, txt as String, col as Str
     lbl.text  = txt
     lbl.color = col
     lbl.font  = "font:SmallestSystemFont"
+    lbl = invalid ' Release ref immediately - grp owns it now. To help with Issue #11.
 end sub
