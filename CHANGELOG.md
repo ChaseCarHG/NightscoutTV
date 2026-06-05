@@ -1,5 +1,8 @@
 CHANGELOG    
-  
+
+FRIDAY 05 June 2026 - v0.8.00021-Alpha
+• Resolving compile error related to NightscoutLive.brs by retooling removeChildren command.  
+   
 FRIDAY 05 June 2026 - v0.8.00020-Alpha  
 • Added sub onScreenClosed() to NightscoutLive.brs, to be called in NightscoutLive.xml and triggered from main.brs, with purpose to address [Issue #11](https://github.com/ChaseCarHG/NightscoutTV/issues/11).  
 • Added interface and field for close, to call onScreenClosed, and with plan to trigger it from main.brs, , with purpose to address [Issue #11](https://github.com/ChaseCarHG/NightscoutTV/issues/11).  
