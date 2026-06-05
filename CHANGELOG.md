@@ -1,4 +1,14 @@
-CHANGELOG   
+CHANGELOG    
+  
+FRIDAY 05 June 2026 - v0.8.00020-Alpha  
+• Added sub onScreenClosed() to NightscoutLive.brs, to be called in NightscoutLive.xml and triggered from main.brs, with purpose to address [Issue #11](https://github.com/ChaseCarHG/NightscoutTV/issues/11).  
+• Added interface and field for close, to call onScreenClosed, and with plan to trigger it from main.brs, , with purpose to address [Issue #11](https://github.com/ChaseCarHG/NightscoutTV/issues/11).  
+• In main.brs, removed redundant exit-while line, and amended exit while upon if msg.isScreenClosed  and msg.isLowGeneralMemory to also screen.getScene().close = true. Purpose is to address [Issue #11](https://github.com/ChaseCarHG/NightscoutTV/issues/11).   
+  
+Additionally,   
+• In NightscoutLive.brs drawGraph(), replaced removeChildIndex loop with faster and more memory-friendly atomic operation for [Issue #11](https://github.com/ChaseCarHG/NightscoutTV/issues/11).  
+• In NightscoutLive.brs mkRect(), added final instruction to release r (using r.invalid) since grp now owns the reference; and similar to release lbl in mkLabel().   
+ - Task nodes created from within a task thread are owned by the render thread and accessed via rendezvous. When a node is set as a child or field of another node owned by the render thread, the referenced node becomes owned by the render thread -- and this transfer of ownership is recursively performed on all nodes and fields referenced by a transferred node. So, once a task node's result assocarray gets written to a field that the render thread reads, ownership transfers and the render thread holds a reference. Setting m.fetchTask = invalid in the scene releases our reference, but if the render thread's SceneGraph still has a reference chain to that node, it won't be garbage collected.  
   
 THURSDAY 04 June 2026 - v0.8.00019-Alpha   
 • Working [Issue #12 - Disclaimer Screen hides manually-launched Screensaver Settings Page](https://github.com/ChaseCarHG/NightscoutTV/issues/12), changing disclaimer to start as visible="false" in the NightscoutSetup.xml, then have its .brs make disclaimerOverlay visible="true" then once it has been long enough its .brs will make disclaimerOverlay visible="false"  
