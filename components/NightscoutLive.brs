@@ -1093,12 +1093,12 @@ sub drawGraph(entries as Object, hours as Integer, mgdl as Boolean)
     'while grp.getChildCount() > 0
         'grp.removeChildIndex(0) ' Empty the graph completely, to avoid any stale data or artifacts. 
     'end while
-    ''But this -1 method may be cause of Install Failure: Compilation Failed. NightscoutLive
-    'grp.removeChildren(grp.getChildren(-1, 0)) ' Remove all children atomically, faster and cleaner for GC.
-    ''So landing on this method...
-    children = grp.getChildren(grp.getChildCount(), 0)
-        grp.removeChildren(children)
-    children = invalid
+    'But this -1 method may have been cause of Install Failure: Compilation Failed. NightscoutLive
+    grp.removeChildren(grp.getChildren(-1, 0)) ' Remove all children atomically, faster and cleaner for GC.
+    ''So might later land on this method...
+    'children = grp.getChildren(grp.getChildCount(), 0)
+        'grp.removeChildren(children)
+    'children = invalid
 
     if entries = invalid or entries.Count() = 0 then return
 
@@ -1446,7 +1446,7 @@ sub mkRect(grp as Object, x as Integer, y as Integer, w as Integer, h as Integer
     r.width  = w
     r.height = h
     r.color  = col
-    r.invalid ' Release ref immediately - grp owns it now. To help with Issue #11.
+    r = invalid ' Release ref immediately - grp owns it now. To help with Issue #11.
 end sub
 
 sub mkLabel(grp as Object, x as Integer, y as Integer, txt as String, col as String)
