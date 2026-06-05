@@ -1,5 +1,9 @@
 CHANGELOG    
-
+  
+FRIDAY 05 June 2026 - v0.8.00022-Alpha  
+• In NightscoutLive.brs mkRect(), fixed typo of r.invalid to r = invalid.  
+• Returned to atomic method of grp.removeChildren(grp.getChildren(-1, 0)).  
+  
 FRIDAY 05 June 2026 - v0.8.00021-Alpha
 • Resolving compile error related to NightscoutLive.brs by retooling removeChildren command.  
    
