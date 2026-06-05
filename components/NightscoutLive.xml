@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="NightscoutLive" extends="Scene">
   <script type="text/brightscript" uri="pkg:/components/NightscoutLive.brs" />
+  <interface>
+    <field id="close" type="boolean" value="false" onChange="onScreenClosed" />
+  </interface>
   <children>
 
     <!-- =========================================================
