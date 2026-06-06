@@ -1,5 +1,8 @@
 CHANGELOG    
   
+SATURDAY 06 June 2026 - v0.8.00024-Alpha  
+• In main.brs runLive(), new line scene.getScene().close = true was a typo, so changed to screen.getScene().close = true. This typo prevented exiting the disclaimer screen upon launch.  
+  
 SATURDAY 06 June 2026 - v0.8.00023-Alpha  
 • In main.brs runLive() at screen.CreateScene("NightscoutLive") and screen.show(), surrounded with print statements to provide memory in bytes pre-scene and post-scene using appMonitor.GetChannelAvailableMemory(); and similar for end of sub.  
 • Due to info from "sgnodes roots" command on Telnet :8080 connection: Confirmed cleanup code is not executing consistently, so made architectural changes to null all task references whenever app goes to background:  
