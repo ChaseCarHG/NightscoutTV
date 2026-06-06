@@ -1,5 +1,8 @@
 CHANGELOG    
   
+SATURDAY 06 June 2026 - v0.8.00027-Alpha  
+• For debugging [Issue #11], added to main.brs near if type(msg) = "roSGScreenEvent" a block to print statuses of isScreenClosed, isDisplayHidden, and isDisplayShown.  
+  
 SATURDAY 06 June 2026 - v0.8.00026-Alpha  
 • In main.brs runLive(), added else if msg.isDisplayShown() print "App returned to foreground, so restarting fetches." and screen.getScene().resumed = true.  
 • In NightscoutLive.xml interface block, added <field id="resumed" type="boolean" value="false" onChange="onResumed" />.  
