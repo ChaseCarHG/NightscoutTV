@@ -39,7 +39,11 @@ sub runLive(isScreensaver as Boolean)
     glb.addField("isScreensaver", "boolean", false)
     glb.isScreensaver = isScreensaver
 
-    screen.CreateScene("NightscoutLive")
+    if isScreensaver
+        screen.CreateScene("NightscoutLiveScreensaver")
+    else
+        screen.CreateScene("NightscoutLive")
+    end if
     screen.show()
 
     ' Register for Roku memory warning events, as required by Roku certification (RSG 1.3 / Requirement 4.x). 
