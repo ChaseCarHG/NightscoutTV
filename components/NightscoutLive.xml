@@ -3,6 +3,7 @@
   <script type="text/brightscript" uri="pkg:/components/NightscoutLive.brs" />
   <interface>
     <field id="close" type="boolean" value="false" onChange="onScreenClosed" />
+    <field id="backgrounded" type="boolean" value="false" onChange="onBackgrounded" />
   </interface>
   <children>
 
