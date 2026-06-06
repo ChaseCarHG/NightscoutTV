@@ -195,6 +195,7 @@ sub onBackgrounded()
     ' Called when app goes to background (isDisplayHidden).
     ' Stops tasks only, but leaves timers running so refresh resumes on foreground return.
     print "NightscoutLive.brs: App backgrounded - stopping tasks only"
+    m.top.backgrounded = false  ' Reset so it can fire again next time
     if m.fetchTask   <> invalid then m.fetchTask.control   = "STOP" : m.fetchTask   = invalid
     if m.statusTask  <> invalid then m.statusTask.control  = "STOP" : m.statusTask  = invalid
     if m.basalTask   <> invalid then m.basalTask.control   = "STOP" : m.basalTask   = invalid
@@ -204,6 +205,21 @@ sub onBackgrounded()
     if m.profileTask <> invalid then m.profileTask.control = "STOP" : m.profileTask = invalid
     if m.saveTask    <> invalid then m.saveTask.control    = "STOP" : m.saveTask    = invalid
     if m.loadTask    <> invalid then m.loadTask.control    = "STOP" : m.loadTask    = invalid
+end sub
+
+sub onResumed()
+    ' Called when app returns to foreground after being backgrounded.
+    ' Re-starts all fetches since tasks were stopped during backgrounding.
+    print "NightscoutLive.brs: App resumed - restarting fetches"
+    m.top.resumed = false  ' Reset so it can fire again next time
+    if m.nsUrl = "" then return
+    doFetch()
+    doFetchTreatments()
+    doFetchBasals()
+    doFetchProfile()
+    doFetchStatus()
+    doFetchPills()
+    doFetchDeviceStatus()
 end sub
 
 ' -----------------------------------------------------------------
