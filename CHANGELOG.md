@@ -1,5 +1,11 @@
 CHANGELOG    
   
+SATURDAY 06 June 2026 - v0.8.00026-Alpha  
+• In main.brs runLive(), added else if msg.isDisplayShown() print "App returned to foreground, so restarting fetches." and screen.getScene().resumed = true.  
+• In NightscoutLive.xml interface block, added <field id="resumed" type="boolean" value="false" onChange="onResumed" />.  
+• In NightscoutLive.brs, added onResumed() called when app returns to foreground after being backgrounded, to restart all fetches that were stopped while backgrounded.  
+• In NightscoutLive.brs, for within onBackgrounded() and onResumed(), also ensured m.top.backgrounded and m.top.resumed (respectively) are reset to false, so their tasks can fire again next time as needed.  
+  
 SATURDAY 06 June 2026 - v0.8.00025-Alpha  
 • In main.brs runLive(), moved screen.CreateScene("NightscoutLive") and screen.show() to before defining appMonitor, and then initiated appMonitor, and removed memory debug printing that occured before appMonitor was initialized.  
 • In NightscoutLive.brs, added sub onBackgrounded(), called when app goes to background (isDisplayHidden), and stops tasks only, but leaves timers running so refresh resumes on foreground return.  
