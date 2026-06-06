@@ -168,7 +168,7 @@ end sub
 ' No Keyboard Dialogs on the live screen. That's reserved for Setup. 
 
 ' -----------------------------------------------------------------
-' ON CLOSE CLEANUP UTILITY
+' ON CLOSE & ON BACKGROUND CLEANUP UTILITIES - CLOSE ALSO STOPS TIMERS
 ' -----------------------------------------------------------------
 sub onScreenClosed()
     ' Invoked by NightscoutLive.xml: <field id="close" type="boolean" value="false" onChange="onScreenClosed" />
@@ -189,6 +189,21 @@ sub onScreenClosed()
     if m.ageTimer   <> invalid then m.ageTimer.control     = "STOP" : m.ageTimer    = invalid
     if m.clockTimer <> invalid then m.clockTimer.control   = "STOP" : m.clockTimer  = invalid
     if m.poll       <> invalid then m.poll.control         = "STOP" : m.poll        = invalid
+end sub
+
+sub onBackgrounded()
+    ' Called when app goes to background (isDisplayHidden).
+    ' Stops tasks only, but leaves timers running so refresh resumes on foreground return.
+    print "NightscoutLive.brs: App backgrounded - stopping tasks only"
+    if m.fetchTask   <> invalid then m.fetchTask.control   = "STOP" : m.fetchTask   = invalid
+    if m.statusTask  <> invalid then m.statusTask.control  = "STOP" : m.statusTask  = invalid
+    if m.basalTask   <> invalid then m.basalTask.control   = "STOP" : m.basalTask   = invalid
+    if m.treatTask   <> invalid then m.treatTask.control   = "STOP" : m.treatTask   = invalid
+    if m.deviceTask  <> invalid then m.deviceTask.control  = "STOP" : m.deviceTask  = invalid
+    if m.pillTask    <> invalid then m.pillTask.control    = "STOP" : m.pillTask    = invalid
+    if m.profileTask <> invalid then m.profileTask.control = "STOP" : m.profileTask = invalid
+    if m.saveTask    <> invalid then m.saveTask.control    = "STOP" : m.saveTask    = invalid
+    if m.loadTask    <> invalid then m.loadTask.control    = "STOP" : m.loadTask    = invalid
 end sub
 
 ' -----------------------------------------------------------------
