@@ -4,6 +4,7 @@
   <interface>
     <field id="close" type="boolean" value="false" onChange="onScreenClosed" />
     <field id="backgrounded" type="boolean" value="false" onChange="onBackgrounded" />
+    <field id="resumed" type="boolean" value="false" onChange="onResumed" />
   </interface>
   <children>
 
