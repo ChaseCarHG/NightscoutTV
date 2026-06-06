@@ -1,5 +1,10 @@
 CHANGELOG    
   
+SATURDAY 06 June 2026 - v0.8.00023-Alpha  
+• In main.brs runLive() at screen.CreateScene("NightscoutLive") and screen.show(), surrounded with print statements to provide memory in bytes pre-scene and post-scene using appMonitor.GetChannelAvailableMemory(); and similar for end of sub.  
+• Due to info from "sgnodes roots" command on Telnet :8080 connection: Confirmed cleanup code is not executing consistently, so made architectural changes to null all task references whenever app goes to background:  
+• In main.brs runLive(false) loop, made app detect when it has been moved to background (roSGSceneEvent type isDisplayHidden()), and used to signal scene to clean up via scene.getScene().close = true, alongside debug message of "App is in background. Triggering cleanup."  
+  
 FRIDAY 05 June 2026 - v0.8.00022-Alpha  
 • In NightscoutLive.brs mkRect(), fixed typo of r.invalid to r = invalid.  
 • Returned to atomic method of grp.removeChildren(grp.getChildren(-1, 0)).  
