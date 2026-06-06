@@ -67,6 +67,12 @@ sub runLive(isScreensaver as Boolean)
         'if msg.isScreenClosed() then exit while 'Disabled as redundant code while trying to address Issue #11
 
         if type(msg) = "roSGScreenEvent"
+            print "-----"
+            print "roSGScreenEvent received. Statuses: "
+            print " • isScreenClosed: " msg.isScreenClosed()
+            print " • isDisplayHidden: " msg.isDisplayHidden()
+            print " • isDisplayShown: " msg.isDisplayShown()
+            print "-----"
             ' Screen was closed (e.g. user pressed Back, or OS dismissed screensaver).
             ' Returning here exits runLive() and returns control to the caller
             ' (RunUserInterface or RunScreenSaver in main.brs).
