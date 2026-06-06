@@ -1,5 +1,11 @@
 CHANGELOG    
   
+SATURDAY 06 June 2026 - v0.8.00025-Alpha  
+• In main.brs runLive(), moved screen.CreateScene("NightscoutLive") and screen.show() to before defining appMonitor, and then initiated appMonitor, and removed memory debug printing that occured before appMonitor was initialized.  
+• In NightscoutLive.brs, added sub onBackgrounded(), called when app goes to background (isDisplayHidden), and stops tasks only, but leaves timers running so refresh resumes on foreground return.  
+• In NightscoutLive.xml, added within interface block <field id="backgrounded" type="boolean" value="false" onChange="onBackgrounded" />.  
+• In main.brs runLive(), changed else if msg.isDisplayHidden content command from screen.getScene().closed = true to screen.getScene().backgrounded = true, so that it triggers task-only cleanup on backgrounding, while isScreenClosed() triggers full cleanup including timers via onScreenClosed().  
+  
 SATURDAY 06 June 2026 - v0.8.00024-Alpha  
 • In main.brs runLive(), new line scene.getScene().close = true was a typo, so changed to screen.getScene().close = true. This typo prevented exiting the disclaimer screen upon launch.  
   
