@@ -1,5 +1,9 @@
 CHANGELOG    
   
+SATURDAY 06 June 2026 - v0.8.00028-Alpha  
+• Created NightscoutLiveScreensaver.xml that simply extends NightscoutLive, to allievate screensaver's RunScreenSaver() calls runLive(true), which calls screen.CreateScene("NightscoutLive") — but Roku is returning the existing app's NightscoutLive scene instead of creating a new one, because the same scene is already loaded.  
+• In main.brs runLive(), changed screen.CreateScene("NightscoutLive") to if isScreensaver screen.CreateScene("NightscoutLiveScreensaver") else screen.CreateScene("NightscoutLive") end if... all for the same reasons as above.  
+  
 SATURDAY 06 June 2026 - v0.8.00027-Alpha  
 • For debugging [Issue #11], added to main.brs near if type(msg) = "roSGScreenEvent" a block to print statuses of isScreenClosed, isDisplayHidden, and isDisplayShown.  
   
