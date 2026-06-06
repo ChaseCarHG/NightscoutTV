@@ -41,8 +41,10 @@ sub runLive(isScreensaver as Boolean)
 
     ' Load and display the NightscoutLive scene component. 
     ' This triggers NightscoutLive.brs init() on the render thread. 
+    print "MEMORY  PRE-SCENE: " appMonitor.GetChannelAvailableMemory() " bytes"
     screen.CreateScene("NightscoutLive")
     screen.show()
+    print "MEMORY POST-SCENE: " appMonitor.GetChannelAvailableMemory() " bytes"
 
     ' Register for Roku memory warning events, as required by Roku certification (RSG 1.3 / Requirement 4.x). 
     ' Gives Roku a way to warn us before we run out of memory, on the RokuIP:8085 port using RAW ouput. 
@@ -75,6 +77,10 @@ sub runLive(isScreensaver as Boolean)
             if msg.isScreenClosed() 
                 screen.getScene().close = true
                 exit while
+            else if msg.isDisplayHidden()
+                ' App going to background, so clean up tasks to free memory, especially for screen saver mode.
+                print "App is in background. Triggering cleanup."
+                scene.getScene().close = true ' Note this doesn't exit the loop, but the scene cleans up its task while app keeps running so it may come back to foreground.
             end if
 
         else if type(msg) = "roAppMemoryMonitorEvent"
@@ -108,9 +114,10 @@ sub runLive(isScreensaver as Boolean)
     print "runLive() exiting - releasing resources"
     screen = invalid
     port = invalid
-    appMonitor = invalid
     lim = invalid
-    print "runLive resource releases completed"
+    print "MEMORY POST-CLEANUP: " appMonitor.GetChannelAvailableMemory() " bytes"
+    appMonitor = invalid
+    print "runLive() cleanup and resource releases completed"
 end sub
 
 
