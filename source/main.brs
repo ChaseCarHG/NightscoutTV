@@ -75,8 +75,11 @@ sub runLive(isScreensaver as Boolean)
                 exit while
             else if msg.isDisplayHidden()
                 ' App going to background, so clean up tasks to free memory, especially for screen saver mode.
-                print "App is in background. Triggering cleanup."
+                print "App is in background. Triggering task cleanup."
                 screen.getScene().backgrounded = true ' Note this doesn't exit the loop, but the scene cleans up its task while app keeps running so it may come back to foreground.
+            else if msg.isDisplayShown()
+                print "App returned to foreground, so restarting fetches."
+                screen.getScene().resumed = true
             end if
 
         else if type(msg) = "roAppMemoryMonitorEvent"
