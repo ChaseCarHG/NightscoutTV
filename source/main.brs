@@ -39,12 +39,8 @@ sub runLive(isScreensaver as Boolean)
     glb.addField("isScreensaver", "boolean", false)
     glb.isScreensaver = isScreensaver
 
-    ' Load and display the NightscoutLive scene component. 
-    ' This triggers NightscoutLive.brs init() on the render thread. 
-    print "MEMORY  PRE-SCENE: " appMonitor.GetChannelAvailableMemory() " bytes"
     screen.CreateScene("NightscoutLive")
     screen.show()
-    print "MEMORY POST-SCENE: " appMonitor.GetChannelAvailableMemory() " bytes"
 
     ' Register for Roku memory warning events, as required by Roku certification (RSG 1.3 / Requirement 4.x). 
     ' Gives Roku a way to warn us before we run out of memory, on the RokuIP:8085 port using RAW ouput. 
